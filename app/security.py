@@ -15,7 +15,7 @@ from litestar_users.config import (
 )
 from litestar_users.service import BaseUserService
 
-from app.models import UserModel as User
+from app.models import UserModel as User, UserModel, ProjectModel, ProjectUserModel
 
 ENCODING_SECRET = "1234567890abcdef"  # noqa: S105
 DATABASE_URL = "sqlite+aiosqlite:///"
@@ -39,10 +39,25 @@ class UserUpdateDTO(SQLAlchemyDTO[User]):
     config = SQLAlchemyDTOConfig(exclude={"password_hash", "projects", "project_users"}, partial=True)
 
 
-class UserService(BaseUserService[User, Any]):  # type: ignore[type-var]
+class SecurityService(BaseUserService[User, Any]):  # type: ignore[type-var]
     async def post_registration_hook(self, user: User, request: Request | None = None) -> None:
         print(f"User <{user.email}> has registered!")
+        await self.init_new_user(user)
         await self.user_repository.session.commit()
+
+    async def init_new_user(self, user: UserModel):
+        project = ProjectModel(
+            code="own",
+            name="own",
+            description="created by the system",
+            author=user,
+        )
+        project_user = ProjectUserModel(
+            project=project,
+            user=user,
+            current=True,
+        )
+        self.user_repository.session.add(project_user)
 
 
 litestar_users = LitestarUsersPlugin(
@@ -53,7 +68,7 @@ litestar_users = LitestarUsersPlugin(
         user_read_dto=UserReadDTO,
         user_registration_dto=UserRegistrationDTO,
         user_update_dto=UserUpdateDTO,
-        user_service_class=UserService,  # pyright: ignore
+        user_service_class=SecurityService,  # pyright: ignore
         auto_commit_transactions=False,
         auth_handler_config=AuthHandlerConfig(),
         register_handler_config=RegisterHandlerConfig(),

@@ -31,5 +31,5 @@ app = Litestar(
         render_plugins=[ScalarRenderPlugin()],
     ),
     debug=True,
-    dependencies={"limit_offset": Provide(provide_limit_offset_pagination)}
+    dependencies={"limit_offset": Provide(provide_limit_offset_pagination, sync_to_thread=False)},
 )

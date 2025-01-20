@@ -36,7 +36,6 @@ class ReferenceMixin:
 
 class ProjectModel(BaseModel, ReferenceMixin):
     __tablename__ = "projects"
-    default: Mapped[bool] = mapped_column(String, nullable=False)
     author_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     author: Mapped[UserModel] = relationship(back_populates="projects")
     users: Mapped[List["ProjectUserModel"]] = relationship(back_populates="project")
@@ -67,8 +66,10 @@ class AccountModel(BaseModel, ReferenceMixin, ProjectLinkMixin):
 
 class ProjectUserModel(BaseModel, ProjectLinkMixin):
     __tablename__ = "project_users"
+    current: Mapped[bool] = mapped_column(default=False, nullable=False)
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
-    account_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("accounts.id"), nullable=False)
+    account_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("accounts.id"), default=None, nullable=True)
+
     user: Mapped[UserModel] = relationship(back_populates="project_users")
     account: Mapped[AccountModel] = relationship()
 

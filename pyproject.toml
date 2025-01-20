@@ -9,4 +9,5 @@ dependencies = [
     "aiosqlite>=0.20.0",
     "litestar-users>=1.3.0",
     "litestar[jwt,standard]>=2.13.0",
+    "pydantic>=2.10.4",
 ]

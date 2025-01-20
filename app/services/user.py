@@ -2,24 +2,25 @@ from litestar.plugins.sqlalchemy import (
     service,
 )
 
-from app.models import UserModel
+from app.models import UserModel, ProjectModel, ProjectUserModel
 from app.reposiotories import UserRepository
-from app.schema import CreateUser, User
 
 
 class UserService(service.SQLAlchemyAsyncRepositoryService[UserModel]):
     repository_type = UserRepository
 
-    async def sign_up(self, create_user: CreateUser) -> User:
-        user = UserModel(
-            email=create_user.email,
-            username=create_user.username,
-            hash_password=create_user.password
+    async def init_new_user(self, user: UserModel, auto_commit: bool | None = None):
+        project = ProjectModel(
+            code="own",
+            name="own",
+            description="created by the system",
+            author=user,
         )
-        user = await self.create(user)
-        return User(
-            id=user.id,
-            email=user.email,
-            username=user.username,
+        project_user = ProjectUserModel(
+            project=project,
+            user=user,
+            current=True,
         )
-
+        self.repository.session.add(project_user)
+        if auto_commit:
+            await self.repository.session.commit()
