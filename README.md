@@ -6,7 +6,29 @@
     + [ ] Валюты
     + [ ] Счета
 
+### Запуск проекта
+1. Установить UV: [Документация UV](https://docs.astral.sh/uv/getting-started/installation/)
+2. Скачать зависимости
+```shell
+  uv sync --frozen
+ ```
+3. Запуск проекта
+```shell
+  litestar run
+```
 
-## список покупок
-Фотографируешь товар с ценой и он добавляется в список покупок и показывает текущий итог
+### Запуск через Docker-compose
+```shell
+docker-compose up
+```
+Для фоновоого режима:
+```shell
+docker-compose up -d
+```
+
+### Зайти в консоль контейнера
+```shell
+docker build -t accounting_api . && docker run -it --entrypoint /bin/bash accounting_api
+```
+
 
