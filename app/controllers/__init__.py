@@ -1,9 +1,8 @@
 from litestar import Router
-from .reference import CategoryController
-
+from .reference import CategoryController, CurrencyController
 
 router = Router(path='/api/v1/', route_handlers=[
-    CategoryController
+    CategoryController, CurrencyController
 ])
 
 __all__ = [

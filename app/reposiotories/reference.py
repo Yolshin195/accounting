@@ -11,13 +11,13 @@ class CategoryRepository(repository.SQLAlchemyAsyncRepository[CategoryModel]):
     model_type = CategoryModel
 
 
-class AccountRepository(repository.SQLAlchemyAsyncRepository[AccountModel]):
-    """Account repository."""
-
-    model_type = AccountModel
-
-
 class CurrencyRepository(repository.SQLAlchemyAsyncRepository[CurrencyModel]):
     """Currency repository."""
 
     model_type = CurrencyModel
+
+
+class AccountRepository(repository.SQLAlchemyAsyncRepository[AccountModel]):
+    """Account repository."""
+
+    model_type = AccountModel

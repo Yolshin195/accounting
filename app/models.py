@@ -51,6 +51,13 @@ class ProjectLinkMixin:
 
 
 class CurrencyModel(BaseModel, ReferenceMixin, ProjectLinkMixin):
+    """
+    Cущность хранит информацию о валютах
+    Пример:
+    - Рубли
+    - Баты
+    - Доллары
+    """
     __tablename__ = "currencies"
 
 
@@ -59,6 +66,13 @@ class CategoryModel(BaseModel, ReferenceMixin, ProjectLinkMixin):
 
 
 class AccountModel(BaseModel, ReferenceMixin, ProjectLinkMixin):
+    """
+    Сущность хранит информацию о счетах в проекте
+    пример:
+    - Кеш рубли
+    - Кеш баты
+    - Банковская карта баты
+    """
     __tablename__ = "accounts"
     currency_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("currencies.id"), nullable=False)
     currency: Mapped[CurrencyModel] = relationship()
