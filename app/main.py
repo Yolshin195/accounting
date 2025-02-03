@@ -7,7 +7,7 @@ from app.core import provide_limit_offset_pagination
 from app.db import sqlalchemy_config
 
 from litestar.openapi.config import OpenAPIConfig
-from litestar.openapi.plugins import ScalarRenderPlugin
+from litestar.openapi.plugins import SwaggerRenderPlugin
 
 from app.security import litestar_users
 
@@ -28,7 +28,7 @@ app = Litestar(
         title="Litestar Example",
         description="Example of Litestar with Scalar OpenAPI docs",
         version="0.0.1",
-        render_plugins=[ScalarRenderPlugin()],
+        render_plugins=[SwaggerRenderPlugin()],
     ),
     debug=True,
     dependencies={"limit_offset": Provide(provide_limit_offset_pagination, sync_to_thread=False)},

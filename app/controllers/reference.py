@@ -66,4 +66,4 @@ class CategoryController(Controller):
             service: CategoryService
     ) -> None:
         """Удалить запись по UUID"""
-        await service.delete(item_id=item_id)
+        await service.delete(item_id=item_id,  auto_commit=True)
