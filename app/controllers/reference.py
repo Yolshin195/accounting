@@ -7,13 +7,15 @@ from litestar.plugins.sqlalchemy import (
     filters,
 )
 
-from app.providers import get_category_service, get_currency_service
-from app.schema import ReferenceDTO, CreateReferenceDTO, UpdateReferenceDTO
-from app.services.reference import CategoryService, CurrencyService
+from app.providers import get_category_service, get_currency_service, get_account_service
+from app.schema import ReferenceDTO, CreateReferenceDTO, UpdateReferenceDTO, CreateAccountReferenceDTO, \
+    UpdateAccountReferenceDTO
+from app.services.reference import CategoryService, CurrencyService, AccountService
 
 
 class CategoryController(Controller):
-    path = "/reference"
+    path = "/category"
+    tags = ["Category"]
     dependencies = {
         "service": Provide(get_category_service)
     }
@@ -71,6 +73,7 @@ class CategoryController(Controller):
 
 class CurrencyController(Controller):
     path = "/currency"
+    tags = ["Currency"]
     dependencies = {
         "service": Provide(get_currency_service)
     }
@@ -124,4 +127,63 @@ class CurrencyController(Controller):
     ) -> None:
         """Удалить запись валюты по UUID"""
         await service.delete(item_id=item_id, auto_commit=True)
+
+
+class AccountController(Controller):
+    path = "/account"
+    tags = ["Account"]
+    dependencies = {
+        "service": Provide(get_account_service)
+    }
+
+    @get("/")
+    async def account_list(
+            self,
+            limit_offset: filters.LimitOffset,
+            service: AccountService
+    ) -> OffsetPagination[ReferenceDTO]:
+        """Список всех счетов"""
+        return await service.get_all(limit_offset)
+
+    @get("/{item_id:uuid}")
+    async def get_account(
+            self,
+            item_id: UUID,
+            service: AccountService
+    ) -> ReferenceDTO:
+        """Получить запись счета по UUID"""
+        return await service.get_by_id(item_id)
+
+    @post("/")
+    async def create_account(
+            self,
+            data: CreateAccountReferenceDTO,
+            service: AccountService
+    ) -> None:
+        """Создать новую запись счета"""
+        await service.add(data)
+
+    @put("/{item_id:uuid}")
+    async def update_account(
+            self,
+            item_id: UUID,
+            data: UpdateAccountReferenceDTO,
+            service: AccountService
+    ) -> None:
+        """Обновить данные счета"""
+        await service.update(
+            data.model_dump(exclude_unset=True, exclude_none=True),
+            item_id=item_id,
+            auto_commit=True
+        )
+
+    @delete("/{item_id:uuid}")
+    async def delete_account(
+            self,
+            item_id: UUID,
+            service: AccountService
+    ) -> None:
+        """Удалить запись счета по UUID"""
+        await service.delete(item_id=item_id, auto_commit=True)
+
 

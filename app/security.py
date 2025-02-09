@@ -14,6 +14,7 @@ from litestar_users.config import (
     VerificationHandlerConfig,
 )
 from litestar_users.service import BaseUserService
+from pydantic_core.core_schema import tagged_union_schema
 
 from app.models import UserModel as User, UserModel, ProjectModel, ProjectUserModel
 
@@ -70,9 +71,9 @@ litestar_users = LitestarUsersPlugin(
         user_update_dto=UserUpdateDTO,
         user_service_class=SecurityService,  # pyright: ignore
         auto_commit_transactions=False,
-        auth_handler_config=AuthHandlerConfig(),
-        register_handler_config=RegisterHandlerConfig(),
-        verification_handler_config=VerificationHandlerConfig(),
+        auth_handler_config=AuthHandlerConfig(tags=["Security"]),
+        register_handler_config=RegisterHandlerConfig(tags=["Security"]),
+        verification_handler_config=VerificationHandlerConfig(tags=["Security"]),
         session_backend_config=ServerSideSessionConfig()
     )
 )

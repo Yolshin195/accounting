@@ -25,6 +25,18 @@ class UpdateReferenceDTO(BaseModel):
     description: str | None
 
 
+class AccountReferenceDTO(ReferenceDTO):
+    currency: ReferenceDTO
+
+
+class CreateAccountReferenceDTO(CreateReferenceDTO):
+    currency_id: UUID
+
+
+class UpdateAccountReferenceDTO(UpdateReferenceDTO):
+    currency_id: UUID
+
+
 @dataclass
 class User:
     id: UUID
