@@ -8,15 +8,18 @@ from litestar.middleware.session.server_side import ServerSideSessionConfig
 from litestar.security.jwt import JWTAuth
 
 from litestar_users import LitestarUsersPlugin, LitestarUsersConfig
+from litestar_users.adapter.sqlalchemy.protocols import SQLAUserT
 from litestar_users.config import (
     AuthHandlerConfig,
     RegisterHandlerConfig,
     VerificationHandlerConfig,
 )
 from litestar_users.service import BaseUserService
-from pydantic_core.core_schema import tagged_union_schema
 
 from app.models import UserModel as User, UserModel, ProjectModel, ProjectUserModel
+import logging
+
+logger = logging.getLogger(__name__)
 
 ENCODING_SECRET = "1234567890abcdef"  # noqa: S105
 DATABASE_URL = "sqlite+aiosqlite:///"
@@ -59,6 +62,12 @@ class SecurityService(BaseUserService[User, Any]):  # type: ignore[type-var]
             current=True,
         )
         self.user_repository.session.add(project_user)
+
+    async def send_verification_token(self, user: UserModel, token: str) -> None:
+        logger.info(f"Verification token sent to {user.email}: {token}")
+
+    async def post_verification_hook(self, user: SQLAUserT, request: Request | None = None) -> None:
+        await self.user_repository.session.commit()
 
 
 litestar_users = LitestarUsersPlugin(
