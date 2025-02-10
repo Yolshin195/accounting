@@ -6,6 +6,7 @@
     + [X] Валюты
     + [X] Счета
     + [ ] сделать code уникальным в рамках одного project
+    + [ ] настроить запрет на примой прямой commit в мастер
 
 ### Запуск проекта
 1. Установить UV: [Документация UV](https://docs.astral.sh/uv/getting-started/installation/)
