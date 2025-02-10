@@ -6,7 +6,6 @@
     + [X] Валюты
     + [X] Счета
     + [ ] сделать code уникальным в рамках одного project
-    + [ ] настроить запрет на примой прямой commit в мастер тест 2
 
 ### Запуск проекта
 1. Установить UV: [Документация UV](https://docs.astral.sh/uv/getting-started/installation/)
@@ -17,6 +16,10 @@
 3. Запуск проекта
 ```shell
   litestar run
+```
+Или через uv
+```shell
+uv run litestar run
 ```
 
 ### Запуск через Docker-compose
