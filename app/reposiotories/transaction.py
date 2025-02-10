@@ -1,17 +1,17 @@
 from litestar.plugins.sqlalchemy import (
-    repository,
+    repository
 )
 
-from app.models import ExpenseModel, IncomeModel
+from app.models import TransactionModel, LedgerEntryModel
 
 
-class ExpenseRepository(repository.SQLAlchemyAsyncRepository[ExpenseModel]):
-    """Expense repository."""
+class TransactionRepository(repository.SQLAlchemyAsyncRepository[TransactionModel]):
+    """Transaction repository."""
 
-    model_type = ExpenseModel
+    model_type = TransactionModel
 
 
-class IncomeRepository(repository.SQLAlchemyAsyncRepository[IncomeModel]):
-    """Income repository."""
+class LedgerEntryRepository(repository.SQLAlchemyAsyncRepository[LedgerEntryModel]):
+    """Ledger Entry repository."""
 
-    model_type = IncomeModel
+    model_type = LedgerEntryModel

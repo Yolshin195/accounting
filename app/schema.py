@@ -1,7 +1,10 @@
 from dataclasses import dataclass
+from decimal import Decimal
 from uuid import UUID
 
 from pydantic import BaseModel
+
+from app.models import TransactionTypeEnum, TransactionTypeValueEnum
 
 
 class ReferenceDTO(BaseModel):
@@ -35,6 +38,23 @@ class CreateAccountReferenceDTO(CreateReferenceDTO):
 
 class UpdateAccountReferenceDTO(UpdateReferenceDTO):
     currency_id: UUID
+
+
+class TransactionDTO(BaseModel):
+    id: UUID
+    type: TransactionTypeEnum
+    value: Decimal
+    value_type: TransactionTypeValueEnum
+    description: str | None
+    account: ReferenceDTO
+    category: ReferenceDTO
+
+
+class CreateTransactionDTO(BaseModel):
+    value: Decimal
+    category_id: UUID
+    account_id: UUID | None
+    description: str | None
 
 
 @dataclass
