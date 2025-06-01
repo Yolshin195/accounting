@@ -17,19 +17,18 @@ services:
   accounting-bot:
     build:
       context: ./accountingbot
-    ports:
-      - "8080:8080"
     container_name: accounting-bot-container
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - ACTIVEMQ_USER=admin
       - ACTIVEMQ_PASSWORD=admin
+      - TELEGRAM_BOT_TOKEN
     depends_on:
       - artemis
 
   artemis:
     image: apache/activemq-artemis:2.41.0
-    container_name: artemis-broker
+    container_name: accounting-artemis-broker
     environment:
       - ARTEMIS_USER=admin
       - ARTEMIS_PASSWORD=admin

@@ -8,9 +8,22 @@ plugins {
 
 allprojects {
     group = "com.accounting"
-    version = "0.0.1-SNAPSHOT"
+    version = "0.0.2-SNAPSHOT"
 
     repositories {
         mavenCentral()
     }
+}
+
+// 👇 Добавь ниже — задачи Docker Compose
+tasks.register<Exec>("dockerUp") {
+    group = "docker"
+    description = "Build and start all containers using docker-compose"
+    commandLine("docker-compose", "up", "--build", "-d")
+}
+
+tasks.register<Exec>("dockerDown") {
+    group = "docker"
+    description = "Stop and remove all containers using docker-compose"
+    commandLine("docker-compose", "down")
 }
