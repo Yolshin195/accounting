@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  accounting-api:
+    build:
+      context: ./accountingapi
+    ports:
+      - "8080:8080"
+    container_name: accounting-api-container
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - ACTIVEMQ_USER=admin
+      - ACTIVEMQ_PASSWORD=admin
+    depends_on:
+      - artemis
+
+  accounting-bot:
+    build:
+      context: ./accountingbot
+    ports:
+      - "8080:8080"
+    container_name: accounting-bot-container
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - ACTIVEMQ_USER=admin
+      - ACTIVEMQ_PASSWORD=admin
+    depends_on:
+      - artemis
+
+  artemis:
+    image: apache/activemq-artemis:2.41.0
+    container_name: artemis-broker
+    environment:
+      - ARTEMIS_USER=admin
+      - ARTEMIS_PASSWORD=admin
+    ports:
+      - "61616:61616"   # порт для клиентов (JMS)
+      - "8161:8161"     # веб-консоль (http://localhost:8161)
+    volumes:
+      - artemis-data:/var/lib/artemis/data
+
+volumes:
+  artemis-data:

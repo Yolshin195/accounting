@@ -1,0 +1,9 @@
+spring:
+  artemis:
+    broker-url: tcp://localhost:61616
+    user: admin
+    password: admin
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
