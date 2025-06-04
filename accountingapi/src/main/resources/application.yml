@@ -1,3 +1,14 @@
 spring:
   application:
     name: AccountingApi
+  authorization-server:
+    issuer: http://localhost:8080
+
+accounting:
+  accountingbot:
+    username: accounting-bot
+    password: ${ACCOUNTING_BOT_PASSWORD}
+
+jwt:
+  secret: mySecretKey123456789012345678901234567890  # Минимум 32 символа
+  expiration: 86400000

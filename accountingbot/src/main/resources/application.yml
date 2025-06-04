@@ -2,6 +2,17 @@ spring:
   application:
     name: AccountingBot
 
+server:
+  port: 9090
+
 telegram:
   bot:
     token: ${TELEGRAM_BOT_TOKEN}
+
+accounting:
+  accountingbot:
+    username: accounting-bot
+    password: ${ACCOUNTING_BOT_PASSWORD}
+
+api:
+  base-url: http://localhost:8080

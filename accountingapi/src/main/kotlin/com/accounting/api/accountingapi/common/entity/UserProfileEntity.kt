@@ -31,6 +31,9 @@ class UserProfileEntity(
     @Column(nullable = false)
     var accountNonLocked: Boolean = true,
 
+    @Column(name = "telegram_id", unique = true)
+    var telegramId: Long? = null,
+
     @Version
-    var version: Long? = null // <--- Добавьте это поле
+    var version: Long? = null
 ) : BaseEntity()

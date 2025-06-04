@@ -7,4 +7,5 @@ import java.util.UUID
 
 interface UserProfileRepository : CrudRepository<UserProfileEntity, UUID> {
     fun findByUsername(username: String): UserProfileEntity?
+    fun findByTelegramId(telegramId: Long): UserProfileEntity?
 }
