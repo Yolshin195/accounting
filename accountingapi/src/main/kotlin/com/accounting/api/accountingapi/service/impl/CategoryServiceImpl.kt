@@ -36,7 +36,7 @@ class CategoryServiceImpl(
     override fun createCategory(dto: CreateCategoryDto): CategoryDto {
         val user = currentUserService.getCurrentUser()
         val category = CategoryEntity(
-            code = dto.code,
+            code = dto.code.uppercase(),
             name = dto.name,
             description = dto.description,
             type = dto.type,

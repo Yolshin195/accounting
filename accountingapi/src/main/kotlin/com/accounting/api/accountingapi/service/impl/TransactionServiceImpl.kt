@@ -65,7 +65,7 @@ class TransactionServiceImpl(
         type: TransactionTypeEnum
     ): TransactionDto {
         val user = currentUserService.getCurrentUser()
-        val category = categoryRepository.findByUserAndCode(user, categoryCode.lowercase())
+        val category = categoryRepository.findByUserAndCode(user, categoryCode.uppercase())
             ?: throw IllegalArgumentException("Category not found: $categoryCode")
 
         val entity = TransactionEntity(
