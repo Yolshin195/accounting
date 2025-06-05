@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.accounting.api"
-version = "0.0.5-SNAPSHOT"
+version = "0.0.6-SNAPSHOT"
 
 java {
 	toolchain {

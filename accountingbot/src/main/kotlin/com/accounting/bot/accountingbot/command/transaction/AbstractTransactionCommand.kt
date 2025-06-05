@@ -1,58 +1,50 @@
-package com.accounting.bot.accountingbot.command
+package com.accounting.bot.accountingbot.command.transaction
 
+import com.accounting.bot.accountingbot.command.BotCommand
+import com.accounting.bot.accountingbot.command.StatefulCommand
 import com.accounting.bot.accountingbot.common.api.AuthClient
 import com.accounting.bot.accountingbot.common.api.TransactionClient
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Component
 import org.telegram.telegrambots.meta.api.objects.Update
 
-@Component
-class CreateTransactionCommand(
+abstract class AbstractTransactionCommand(
     private val authClient: AuthClient,
     private val transactionClient: TransactionClient,
-    @Value("\${accounting.accountingbot.username}") private val botUsername: String,
-    @Value("\${accounting.accountingbot.password}") private val botPassword: String
+    private val botUsername: String,
+    private val botPassword: String
 ) : BotCommand, StatefulCommand {
 
     data class TransactionCreationSession(
-        var type: TransactionClient.TransactionType? = null,
         var amount: Double? = null,
         var categoryCode: String? = null,
         var description: String? = null
     )
 
     private val sessions = mutableMapOf<Long, TransactionCreationSession>()
-    private val states = mutableMapOf<Long, String>() // type, amount, category, description
+    private val states = mutableMapOf<Long, String>() // amount, category, description
+
+    abstract fun getTransactionType(): TransactionClient.TransactionType
+    abstract fun getStartCommand(): String
+    abstract fun getStartPrompt(): String
 
     override fun hasSessionFor(userId: Long): Boolean = sessions.containsKey(userId)
 
-    override fun supports(text: String): Boolean = text.startsWith("/create_transaction", ignoreCase = true)
+    override fun supports(text: String): Boolean = text.startsWith(getStartCommand(), ignoreCase = true)
 
     override fun handle(update: Update): String {
         val user = update.message?.from ?: return "Не удалось определить пользователя"
         val userId = user.id
         val text = update.message.text.trim()
 
-        // Начало диалога
-        if (text.equals("/create_transaction", ignoreCase = true)) {
+        if (text.equals(getStartCommand(), ignoreCase = true)) {
             sessions[userId] = TransactionCreationSession()
-            states[userId] = "type"
-            return "Введите тип транзакции (EXPENSE или INCOME):"
+            states[userId] = "amount"
+            return getStartPrompt()
         }
 
         val session = sessions[userId] ?: return ""
         val state = states[userId] ?: return ""
 
         when (state) {
-            "type" -> {
-                session.type = try {
-                    TransactionClient.TransactionType.valueOf(text.uppercase())
-                } catch (_: Exception) {
-                    return "Неверный тип. Введите EXPENSE или INCOME:"
-                }
-                states[userId] = "amount"
-                return "Введите сумму:"
-            }
             "amount" -> {
                 val amount = text.toDoubleOrNull()
                 if (amount == null || amount <= 0) {
@@ -79,8 +71,8 @@ class CreateTransactionCommand(
                     )
                 )
 
-                try {
-                    val created = when (session.type!!) {
+                return try {
+                    val created = when (getTransactionType()) {
                         TransactionClient.TransactionType.EXPENSE -> transactionClient.createExpense(
                             TransactionClient.CreateExpenseDto(
                                 amount = session.amount!!,
@@ -99,20 +91,17 @@ class CreateTransactionCommand(
                         )
                     }
 
-                    // Очистка сессии
+                    "✅ Транзакция создана: ${created.type} ${created.amount} в категории ${created.category}"
+                } catch (e: Exception) {
+                    "❌ Ошибка при создании транзакции: ${e.message}"
+                } finally {
+                    // Очистка в любом случае
                     sessions.remove(userId)
                     states.remove(userId)
-
-                    return "✅ Транзакция создана: ${created.type} ${created.amount} в категории ${created.category}"
-                } catch (e: Exception) {
-                    return "❌ Ошибка при создании транзакции: ${e.message}"
                 }
             }
         }
 
-        return "❓ Неожиданная ошибка. Попробуйте снова /create_transaction"
+        return "❓ Неожиданная ошибка. Попробуйте снова ${getStartCommand()}"
     }
-
-    override fun getDescription(): String = "пошаговое создание транзакции"
-    override fun getCommandName(): String = "/create_transaction"
 }
