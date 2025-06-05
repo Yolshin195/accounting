@@ -29,7 +29,7 @@ class CreateCategoryCommand(
     override fun supports(text: String): Boolean = text.startsWith("/create_category", ignoreCase = true)
 
     override fun handle(update: Update): String {
-        val user = update.message?.from ?: return "Не удалось определить пользователя"
+        val user = update.message?.from ?: return "Could not identify the user"
         val userId = user.id
         val text = update.message.text.trim()
 
@@ -37,7 +37,7 @@ class CreateCategoryCommand(
         if (text == "/create_category") {
             sessions[userId] = CategoryCreationSession()
             states[userId] = "code"
-            return "Введите код категории (например, FOOD):"
+            return "Please enter the category code (e.g., FOOD):"
         }
 
         val session = sessions[userId] ?: return ""
@@ -47,17 +47,17 @@ class CreateCategoryCommand(
             "code" -> {
                 session.code = text
                 states[userId] = "name"
-                return "Введите название категории (например, 🍔 Еда):"
+                return "Please enter the category name (e.g., 🍔 Food):"
             }
             "name" -> {
                 session.name = text
                 states[userId] = "desc"
-                return "Введите описание категории:"
+                return "Please enter the category description:"
             }
             "desc" -> {
                 session.description = text
                 states[userId] = "type"
-                return "Введите тип (EXPENSE или INCOME, по умолчанию EXPENSE):"
+                return "Please enter the type (EXPENSE or INCOME, default is EXPENSE):"
             }
             "type" -> {
                 session.type = try {
@@ -91,16 +91,16 @@ class CreateCategoryCommand(
                     sessions.remove(userId)
                     states.remove(userId)
 
-                    "✅ Категория создана: ${created.name} (${created.code}) [${created.type}]"
+                    "✅ Category created: ${created.name} (${created.code}) [${created.type}]"
                 } catch (e: Exception) {
-                    "❌ Ошибка при создании категории: ${e.message}"
+                    "❌ Error creating category: ${e.message}"
                 }
             }
         }
 
-        return "❓ Неожиданная ошибка. Попробуйте снова /create_category"
+        return "❓ Unexpected error. Please try again with /create_category"
     }
 
-    override fun getDescription(): String = "пошаговое создание категории"
+    override fun getDescription(): String = "step-by-step category creation"
     override fun getCommandName(): String = "/create_category"
 }
