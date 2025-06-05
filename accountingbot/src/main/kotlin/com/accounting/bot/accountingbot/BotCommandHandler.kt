@@ -1,6 +1,7 @@
 package com.accounting.bot.accountingbot
 
 import com.accounting.bot.accountingbot.command.BotCommand
+import com.accounting.bot.accountingbot.command.CreateCategoryCommand
 import com.accounting.bot.accountingbot.command.StatefulCommand
 import org.springframework.stereotype.Component
 import org.telegram.telegrambots.meta.api.objects.Update
@@ -11,7 +12,14 @@ class BotCommandHandler(
 ) {
     fun handle(update: Update): String {
         // Сначала проверить, есть ли команда, которая ведёт активную сессию для пользователя
-        val userId = update.message.from.id
+        val userId = update.message?.from?.id ?: update.callbackQuery?.from?.id ?: return "❌ No user"
+
+        if (update.hasCallbackQuery()) {
+            val sessionCommand = commands.find { it is StatefulCommand && it.hasSessionFor(userId) }
+            if (sessionCommand is CreateCategoryCommand) {
+                return sessionCommand.handleCallback(update) ?: "❓ Unknown callback"
+            }
+        }
 
         val sessionCommand = commands.find { it is StatefulCommand && it.hasSessionFor(userId) }
         if (sessionCommand != null) {

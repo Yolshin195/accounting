@@ -22,11 +22,24 @@ class AccountingTelegramBot (
     override fun getUpdatesConsumer(): LongPollingUpdateConsumer = this
 
     override fun consume(update: Update?) {
-        if (update == null || !update.hasMessage() || !update.message.hasText()) return
+        if (update == null) return
+
+        if (update.hasCallbackQuery()) {
+            val responseText = botCommandHandler.handle(update)
+            println("responseText= $responseText")
+            if (responseText.isNotEmpty()) {
+                sendMessage(update.callbackQuery.message.chatId, responseText)
+            }
+            return
+        }
+
+        if (!update.hasMessage() || !update.message.hasText()) return
 
         val responseText = botCommandHandler.handle(update)
         println("responseText= $responseText")
-        sendMessage(update.message.chatId, responseText)
+        if (responseText.isNotEmpty()) {
+            sendMessage(update.message.chatId, responseText)
+        }
     }
 
     private fun sendMessage(chatId: Long, text: String) {
