@@ -27,15 +27,6 @@ class CategoryClient(
         val type: CategoryType
     )
 
-    data class TransactionDto(
-        val id: UUID,
-        val amount: Double,
-        val category: String,
-        val description: String?,
-        val date: String,
-        val type: TransactionType
-    )
-
     data class PageCategoryDto(
         val totalElements: Long,
         val totalPages: Int,
@@ -44,7 +35,7 @@ class CategoryClient(
         val size: Int,
         val content: List<CategoryDto>,
         val number: Int,
-        val sort: List<SortObject>,
+        val sort: SortObject, // ❗️Было List<SortObject>, должно быть просто SortObject
         val numberOfElements: Int,
         val pageable: PageableObject,
         val empty: Boolean
@@ -52,7 +43,7 @@ class CategoryClient(
 
     data class PageableObject(
         val offset: Long,
-        val sort: List<SortObject>,
+        val sort: SortObject, // ❗️То же самое
         val paged: Boolean,
         val pageNumber: Int,
         val pageSize: Int,
@@ -60,18 +51,12 @@ class CategoryClient(
     )
 
     data class SortObject(
-        val direction: String?,
-        val nullHandling: String?,
-        val ascending: Boolean,
-        val property: String?,
-        val ignoreCase: Boolean?
+        val empty: Boolean,
+        val unsorted: Boolean,
+        val sorted: Boolean
     )
 
     enum class CategoryType {
-        EXPENSE, INCOME
-    }
-
-    enum class TransactionType {
         EXPENSE, INCOME
     }
 

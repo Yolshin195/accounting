@@ -7,4 +7,5 @@ interface BotCommand {
     fun supports(text: String): Boolean
     fun handle(update: Update): String
     fun getDescription(): String
+    fun getCommandName(): String
 }

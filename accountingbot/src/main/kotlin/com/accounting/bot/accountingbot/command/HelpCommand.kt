@@ -14,10 +14,11 @@ class HelpCommand(
         return buildString {
             appendLine("📋 Доступные команды:")
             commands.forEach {
-                appendLine(it.getDescription())
+                appendLine("${it.getCommandName()} - ${it.getDescription()}")
             }
         }
     }
 
-    override fun getDescription(): String = "/help – показать список всех команд"
+    override fun getDescription(): String = "показать список всех команд"
+    override fun getCommandName(): String = "/help"
 }

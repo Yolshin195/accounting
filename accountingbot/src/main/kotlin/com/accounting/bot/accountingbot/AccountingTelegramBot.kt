@@ -25,6 +25,7 @@ class AccountingTelegramBot (
         if (update == null || !update.hasMessage() || !update.message.hasText()) return
 
         val responseText = botCommandHandler.handle(update)
+        println("responseText= $responseText")
         sendMessage(update.message.chatId, responseText)
     }
 
@@ -34,6 +35,7 @@ class AccountingTelegramBot (
             telegramClient.execute(message)
         } catch (e: Exception) {
             println("Ошибка при отправке сообщения: ${e.message}")
+            e.printStackTrace()
         }
     }
 }

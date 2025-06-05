@@ -25,8 +25,9 @@ class StartCommand(
             username = username
         ))
         println(jwt.token)
-        return "Привет, $username! Добро пожаловать в Pinpan ✨"
+        return "Привет, $username! Добро пожаловать в AccountingBot ✨"
     }
 
-    override fun getDescription(): String = "/start – старт"
+    override fun getDescription(): String = "старт"
+    override fun getCommandName(): String = "/start"
 }
