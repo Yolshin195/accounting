@@ -14,10 +14,10 @@ jobs:
           git clone https://github.com/Yolshin195/accounting.git .
 
       - name: Stop old containers
-        run: docker-compose stop
+        run: docker compose stop
 
       - name: Build new containers
-        run: docker-compose build
+        run: docker compose build
 
       - name: Start containers
-        run: docker-compose up -d
+        run: docker compose up -d
