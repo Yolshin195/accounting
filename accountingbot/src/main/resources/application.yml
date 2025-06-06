@@ -13,6 +13,3 @@ accounting:
   accountingbot:
     username: accounting-bot
     password: ${ACCOUNTING_BOT_PASSWORD}
-
-api:
-  base-url: http://localhost:8080

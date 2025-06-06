@@ -11,6 +11,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - ACTIVEMQ_USER=admin
       - ACTIVEMQ_PASSWORD=admin
+      - ACCOUNTING_BOT_PASSWORD
     depends_on:
       - artemis
 
@@ -23,6 +24,7 @@ services:
       - ACTIVEMQ_USER=admin
       - ACTIVEMQ_PASSWORD=admin
       - TELEGRAM_BOT_TOKEN
+      - ACCOUNTING_BOT_PASSWORD
     depends_on:
       - artemis
 

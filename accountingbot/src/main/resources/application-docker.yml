@@ -3,3 +3,6 @@ spring:
     broker-url: tcp://artemis:61616
     user: admin
     password: admin
+
+api:
+  base-url: http://accounting-api:8080
