@@ -7,13 +7,14 @@ on:
 jobs:
   deploy:
     runs-on: [self-hosted, home_pi]
+
     steps:
       - name: Checkout code manually
         run: |
           git clone https://github.com/Yolshin195/accounting.git .
 
       - name: Stop old containers
-        run: docker-compose down
+        run: docker-compose stop
 
       - name: Build new containers
         run: docker-compose build
