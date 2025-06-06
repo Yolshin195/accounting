@@ -8,7 +8,7 @@ plugins {
 
 allprojects {
     group = "com.accounting"
-    version = "0.0.6-SNAPSHOT"
+    version = "0.0.8-SNAPSHOT"
 
     repositories {
         mavenCentral()

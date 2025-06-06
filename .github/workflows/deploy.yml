@@ -8,8 +8,9 @@ jobs:
   deploy:
     runs-on: [self-hosted, home_pi]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout code manually
+        run: |
+          git clone https://github.com/Yolshin195/accounting.git .
 
       - name: Stop old containers
         run: docker-compose down
