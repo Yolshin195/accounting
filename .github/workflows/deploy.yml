@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, home_pi]
+    runs-on: [self-hosted, accounting]
 
     steps:
       - name: Checkout code manually
