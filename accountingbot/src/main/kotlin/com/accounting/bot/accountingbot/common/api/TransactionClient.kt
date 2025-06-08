@@ -26,14 +26,6 @@ class TransactionClient(
         val description: String? = null
     )
 
-    data class CategoryDto(
-        val id: UUID,
-        val code: String,
-        val name: String,
-        val description: String?,
-        val type: CategoryType
-    )
-
     data class TransactionDto(
         val id: UUID,
         val amount: Double,
@@ -49,17 +41,15 @@ class TransactionClient(
     )
 
     data class PageTransactionDto(
-        val totalElements: Long,
-        val totalPages: Int,
-        val first: Boolean,
-        val last: Boolean,
-        val size: Int,
         val content: List<TransactionDto>,
+        val page: PageInfo
+    )
+
+    data class PageInfo(
+        val size: Int,
         val number: Int,
-        val sort: List<SortObject>,
-        val numberOfElements: Int,
-        val pageable: PageableObject,
-        val empty: Boolean
+        val totalElements: Long,
+        val totalPages: Int
     )
 
     data class PageableObject(
@@ -78,10 +68,6 @@ class TransactionClient(
         val property: String?,
         val ignoreCase: Boolean?
     )
-
-    enum class CategoryType {
-        EXPENSE, INCOME
-    }
 
     enum class TransactionType {
         EXPENSE, INCOME

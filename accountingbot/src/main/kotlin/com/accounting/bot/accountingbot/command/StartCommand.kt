@@ -1,5 +1,6 @@
 package com.accounting.bot.accountingbot.command
 
+import com.accounting.bot.accountingbot.MessageSender
 import com.accounting.bot.accountingbot.common.api.AuthClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -8,13 +9,15 @@ import org.telegram.telegrambots.meta.api.objects.Update
 @Component
 class StartCommand(
     var authClient: AuthClient,
+    private val messageSender: MessageSender,
     @Value("\${accounting.accountingbot.username}") private val botUsername: String,
     @Value("\${accounting.accountingbot.password}") private val botPassword: String,
 ) : BotCommand {
 
     override fun supports(text: String) = text.startsWith("/start", ignoreCase = true)
 
-    override fun handle(update: Update): String {
+    override fun handle(update: Update) {
+        val chatId = update.message?.chatId ?: return
         val user = update.message?.from
         val username = user?.userName ?: "пользователь"  // на случай, если username null
         val telegramId = user?.id ?: throw IllegalArgumentException("telegramId is null")
@@ -25,7 +28,7 @@ class StartCommand(
             username = username
         ))
         println(jwt.token)
-        return "Привет, $username! Добро пожаловать в AccountingBot ✨"
+        return messageSender.sendMessage(chatId,"Привет, $username! Добро пожаловать в AccountingBot ✨")
     }
 
     override fun getDescription(): String = "старт"

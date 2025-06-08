@@ -4,4 +4,5 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 
 interface MessageSender {
     fun sendMessageWithKeyboard(chatId: Long, text: String, keyboard: InlineKeyboardMarkup)
+    fun sendMessage(chatId: Long, text: String)
 }

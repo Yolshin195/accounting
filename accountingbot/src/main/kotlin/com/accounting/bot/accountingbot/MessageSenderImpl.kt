@@ -21,4 +21,14 @@ class MessageSenderImpl(
         }
     }
 
+    override fun sendMessage(chatId: Long, text: String) {
+        try {
+            val message = SendMessage(chatId.toString(), text)
+            telegramClient.execute(message)
+        } catch (e: Exception) {
+            println("Ошибка при отправке сообщения: ${e.message}")
+            e.printStackTrace()
+        }
+    }
+
 }

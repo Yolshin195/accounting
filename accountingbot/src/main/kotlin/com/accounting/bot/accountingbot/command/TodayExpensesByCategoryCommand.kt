@@ -1,5 +1,6 @@
 package com.accounting.bot.accountingbot.command
 
+import com.accounting.bot.accountingbot.MessageSender
 import com.accounting.bot.accountingbot.common.api.AuthClient
 import com.accounting.bot.accountingbot.common.api.TransactionClient
 import org.springframework.beans.factory.annotation.Value
@@ -10,14 +11,16 @@ import org.telegram.telegrambots.meta.api.objects.Update
 class TodayExpensesByCategoryCommand(
     private val authClient: AuthClient,
     private val transactionClient: TransactionClient,
+    private val messageSender: MessageSender,
     @Value("\${accounting.accountingbot.username}") private val botUsername: String,
     @Value("\${accounting.accountingbot.password}") private val botPassword: String
 ) : BotCommand {
 
     override fun supports(text: String): Boolean = text.equals("/today_expenses", ignoreCase = true)
 
-    override fun handle(update: Update): String {
-        val user = update.message?.from ?: return "Не удалось определить пользователя"
+    override fun handle(update: Update) {
+        val chatId = update.message?.chatId ?: return
+        val user = update.message?.from ?: return
         val userId = user.id
 
         val jwt = authClient.loginTelegram(
@@ -32,13 +35,13 @@ class TodayExpensesByCategoryCommand(
         return try {
             val expenses = transactionClient.getTodayExpensesByCategory(jwt.token)
             if (expenses.isEmpty()) {
-                "Сегодня расходов нет."
+                messageSender.sendMessage(chatId, "Сегодня расходов нет.")
             } else {
                 val lines = expenses.map { "• ${it.categoryCode}: ${"%.2f".format(it.totalAmount)}" }
-                "Сегодняшние расходы по категориям:\n" + lines.joinToString("\n")
+                messageSender.sendMessage(chatId, "Сегодняшние расходы по категориям:\n" + lines.joinToString("\n"))
             }
         } catch (e: Exception) {
-            "❌ Ошибка при получении данных: ${e.message}"
+            messageSender.sendMessage(chatId, "❌ Ошибка при получении данных: ${e.message}")
         }
     }
 

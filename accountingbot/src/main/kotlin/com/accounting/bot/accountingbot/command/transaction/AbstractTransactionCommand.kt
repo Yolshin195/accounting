@@ -1,5 +1,6 @@
 package com.accounting.bot.accountingbot.command.transaction
 
+import com.accounting.bot.accountingbot.MessageSender
 import com.accounting.bot.accountingbot.command.BotCommand
 import com.accounting.bot.accountingbot.command.StatefulCommand
 import com.accounting.bot.accountingbot.common.api.AuthClient
@@ -9,8 +10,9 @@ import org.telegram.telegrambots.meta.api.objects.Update
 abstract class AbstractTransactionCommand(
     private val authClient: AuthClient,
     private val transactionClient: TransactionClient,
+    private val messageSender: MessageSender,
     private val botUsername: String,
-    private val botPassword: String
+    private val botPassword: String,
 ) : BotCommand, StatefulCommand {
 
     data class TransactionCreationSession(
@@ -30,34 +32,35 @@ abstract class AbstractTransactionCommand(
 
     override fun supports(text: String): Boolean = text.startsWith(getStartCommand(), ignoreCase = true)
 
-    override fun handle(update: Update): String {
-        val user = update.message?.from ?: return "Не удалось определить пользователя"
+    override fun handle(update: Update) {
+        val chatId = update.message?.chatId ?: return
+        val user = update.message?.from ?: return
         val userId = user.id
         val text = update.message.text.trim()
 
         if (text.equals(getStartCommand(), ignoreCase = true)) {
             sessions[userId] = TransactionCreationSession()
             states[userId] = "amount"
-            return getStartPrompt()
+            return messageSender.sendMessage(chatId, getStartPrompt())
         }
 
-        val session = sessions[userId] ?: return ""
-        val state = states[userId] ?: return ""
+        val session = sessions[userId] ?: return
+        val state = states[userId] ?: return
 
         when (state) {
             "amount" -> {
                 val amount = text.toDoubleOrNull()
                 if (amount == null || amount <= 0) {
-                    return "Неверная сумма. Введите положительное число:"
+                    return messageSender.sendMessage(chatId, "Неверная сумма. Введите положительное число:")
                 }
                 session.amount = amount
                 states[userId] = "category"
-                return "Введите код категории (например, FOOD):"
+                return messageSender.sendMessage(chatId, "Введите код категории (например, FOOD):")
             }
             "category" -> {
                 session.categoryCode = text
                 states[userId] = "description"
-                return "Введите описание (можно оставить пустым):"
+                return messageSender.sendMessage(chatId, "Введите описание (можно оставить пустым):")
             }
             "description" -> {
                 session.description = if (text.isBlank()) null else text
@@ -91,9 +94,9 @@ abstract class AbstractTransactionCommand(
                         )
                     }
 
-                    "✅ Транзакция создана: ${created.type} ${created.amount} в категории ${created.category}"
+                    messageSender.sendMessage(chatId, "✅ Транзакция создана: ${created.type} ${created.amount} в категории ${created.category}")
                 } catch (e: Exception) {
-                    "❌ Ошибка при создании транзакции: ${e.message}"
+                    messageSender.sendMessage(chatId, "❌ Ошибка при создании транзакции: ${e.message}")
                 } finally {
                     // Очистка в любом случае
                     sessions.remove(userId)
@@ -102,6 +105,6 @@ abstract class AbstractTransactionCommand(
             }
         }
 
-        return "❓ Неожиданная ошибка. Попробуйте снова ${getStartCommand()}"
+        return messageSender.sendMessage(chatId, "❓ Неожиданная ошибка. Попробуйте снова ${getStartCommand()}")
     }
 }

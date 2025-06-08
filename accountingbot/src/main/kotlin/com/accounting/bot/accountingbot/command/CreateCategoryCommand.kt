@@ -33,8 +33,9 @@ class CreateCategoryCommand(
 
     override fun supports(text: String): Boolean = text.startsWith("/create_category", ignoreCase = true)
 
-    override fun handle(update: Update): String {
-        val user = update.message?.from ?: return "Could not identify the user"
+    override fun handle(update: Update) {
+        val chatId = update.message?.chatId ?: return
+        val user = update.message?.from ?: return
         val userId = user.id
         val text = update.message.text.trim()
 
@@ -42,38 +43,38 @@ class CreateCategoryCommand(
         if (text == "/create_category") {
             sessions[userId] = CategoryCreationSession()
             states[userId] = "code"
-            return "Please enter the category code (e.g., FOOD):"
+            return messageSender.sendMessage(chatId, "Please enter the category code (e.g., FOOD):")
         }
 
-        val session = sessions[userId] ?: return ""
-        val state = states[userId] ?: return ""
+        val session = sessions[userId] ?: return
+        val state = states[userId] ?: return
 
         when (state) {
             "code" -> {
                 session.code = text
                 states[userId] = "name"
-                return "Please enter the category name (e.g., 🍔 Food):"
+                return messageSender.sendMessage(chatId, "Please enter the category name (e.g., 🍔 Food):")
             }
             "name" -> {
                 session.name = text
                 states[userId] = "desc"
-                return "Please enter the category description:"
+                return messageSender.sendMessage(chatId, "Please enter the category description:")
             }
             "desc" -> {
                 session.description = text
                 states[userId] = "waiting_type"
-                messageSender.sendMessageWithKeyboard(update.message.chatId, "Choose category type:", createTypeKeyboard())
-                return ""
+                return messageSender.sendMessageWithKeyboard(update.message.chatId, "Choose category type:", createTypeKeyboard())
             }
         }
 
-        return "❓ Unexpected error. Please try again with /create_category"
+        return messageSender.sendMessage(chatId, "❓ Unexpected error. Please try again with /create_category")
     }
 
-    fun handleCallback(update: Update): String? {
-        val callback = update.callbackQuery ?: return null
+    fun handleCallback(update: Update) {
+        val callback = update.callbackQuery ?: return
+        val chatId = callback.message?.chatId ?: return
         val userId = callback.from.id
-        val session = sessions[userId] ?: return null
+        val session = sessions[userId] ?: return
 
         val data = callback.data
         if (data == "CATEGORY_TYPE_EXPENSE" || data == "CATEGORY_TYPE_INCOME") {
@@ -99,16 +100,16 @@ class CreateCategoryCommand(
                     jwt.token
                 )
 
-                "✅ Category created: ${created.name} (${created.code}) [${created.type}]"
+                messageSender.sendMessage(chatId, "✅ Category created: ${created.name} (${created.code}) [${created.type}]")
             } catch (e: Exception) {
-                "❌ Error creating category: ${e.message}"
+                messageSender.sendMessage(chatId, "❌ Error creating category: ${e.message}")
             } finally {
                 sessions.remove(userId)
                 states.remove(userId)
             }
         }
 
-        return "❌ Unknown selection"
+        return messageSender.sendMessage(chatId, "❌ Unknown selection")
     }
 
     private fun createTypeKeyboard(): InlineKeyboardMarkup {
