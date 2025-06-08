@@ -28,17 +28,15 @@ class CategoryClient(
     )
 
     data class PageCategoryDto(
-        val totalElements: Long,
-        val totalPages: Int,
-        val first: Boolean,
-        val last: Boolean,
-        val size: Int,
         val content: List<CategoryDto>,
+        val page: PageInfo
+    )
+
+    data class PageInfo(
+        val size: Int,
         val number: Int,
-        val sort: SortObject, // ❗️Было List<SortObject>, должно быть просто SortObject
-        val numberOfElements: Int,
-        val pageable: PageableObject,
-        val empty: Boolean
+        val totalElements: Long,
+        val totalPages: Int
     )
 
     data class PageableObject(

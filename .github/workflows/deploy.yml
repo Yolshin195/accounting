@@ -12,6 +12,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Create .env file
+        run: |
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
+          echo "ACCOUNTING_BOT_PASSWORD=${{ secrets.ACCOUNTING_BOT_PASSWORD }}" >> .env
+
       - name: Stop old containers
         run: docker compose stop
 

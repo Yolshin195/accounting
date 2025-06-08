@@ -35,8 +35,9 @@ class ListCategoriesCommand(
                 "🔹 ${it.name} (${it.code}) – ${it.type}"
             }
 
-            "📦 Categories (page ${categories.number + 1}/${categories.totalPages}):\n$result"
+            "📦 Categories (page ${categories.page.number + 1}/${categories.page.totalPages}):\n$result"
         } catch (e: Exception) {
+            e.printStackTrace()
             "❌ Error retrieving categories: ${e.message}"
         }
     }
