@@ -14,7 +14,7 @@ interface Transaction {
   id: string
   amount: number
   description: string
-  categoryCode: string
+  category: string // Изменено с categoryCode на category
   type: "INCOME" | "EXPENSE"
   date: string
   createdAt: string
@@ -29,7 +29,16 @@ export default function CalendarPage() {
   const [dayModalOpen, setDayModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
+
+  const formatCurrency = (amount: number) => {
+    const localeMap = {
+      en: "en-US",
+      th: "th-TH",
+      ru: "ru-RU",
+    }
+    return amount.toLocaleString(localeMap[locale] || "ru-RU")
+  }
 
   useEffect(() => {
     loadTransactions()
@@ -222,7 +231,7 @@ export default function CalendarPage() {
                       <div className="text-xs text-muted-foreground">{dayTransactions.length} тр.</div>
                       <div className={`text-xs font-medium ${total >= 0 ? "text-green-600" : "text-red-600"}`}>
                         {total >= 0 ? "+" : ""}
-                        {total.toLocaleString("ru-RU")} ₽
+                        {formatCurrency(total)} ₽
                       </div>
                     </div>
                   )}

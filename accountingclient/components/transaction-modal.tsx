@@ -25,7 +25,7 @@ interface Transaction {
   id: string
   amount: number
   description: string
-  categoryCode: string
+  category: string // Изменено с categoryCode на category
   type: "INCOME" | "EXPENSE"
   date: string
 }
@@ -58,7 +58,7 @@ export function TransactionModal({
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
 
   useEffect(() => {
     if (open) {
@@ -86,11 +86,18 @@ export function TransactionModal({
     setLoading(true)
 
     try {
-      const transactionData = {
+      const transactionData: any = {
         amount: Number.parseFloat(amount),
         description,
-        categoryCode,
-        date: selectedDate ? selectedDate.toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+        category: categoryCode, // Изменено с categoryCode на category
+      }
+
+      // Добавляем дату только если она не сегодняшняя или если дата была выбрана
+      const today = new Date().toISOString().split("T")[0]
+      const transactionDate = selectedDate ? selectedDate.toISOString().split("T")[0] : today
+
+      if (transactionDate !== today) {
+        transactionData.date = transactionDate
       }
 
       let newTransaction
@@ -123,7 +130,12 @@ export function TransactionModal({
   }
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString(t("locale") === "th" ? "th-TH" : t("locale") === "en" ? "en-US" : "ru-RU")
+    const localeMap = {
+      en: "en-US",
+      th: "th-TH",
+      ru: "ru-RU",
+    }
+    return date.toLocaleDateString(localeMap[locale] || "ru-RU")
   }
 
   return (

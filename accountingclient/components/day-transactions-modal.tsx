@@ -15,7 +15,7 @@ interface Transaction {
   id: string
   amount: number
   description: string
-  categoryCode: string
+  category: string // Изменено с categoryCode на category
   type: "INCOME" | "EXPENSE"
   date: string
 }
@@ -43,7 +43,13 @@ export function DayTransactionsModal({
   const [editAmount, setEditAmount] = useState("")
   const [editDescription, setEditDescription] = useState("")
   const { toast } = useToast()
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
+
+  const localeMap = {
+    en: "en-US",
+    th: "th-TH",
+    ru: "ru-RU",
+  }
 
   if (!date) return null
 
@@ -71,7 +77,7 @@ export function DayTransactionsModal({
       const updatedData = {
         amount: Number.parseFloat(editAmount),
         description: editDescription,
-        categoryCode: transaction.categoryCode,
+        category: transaction.category, // Изменено с categoryCode на category
         date: transaction.date,
       }
 
@@ -111,7 +117,7 @@ export function DayTransactionsModal({
   }
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString(t("locale") === "th" ? "th-TH" : t("locale") === "en" ? "en-US" : "ru-RU", {
+    return date.toLocaleDateString(localeMap[locale] || "ru-RU", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -132,17 +138,21 @@ export function DayTransactionsModal({
           <div className="grid grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
             <div className="text-center">
               <div className="text-sm text-muted-foreground">{t("calendar.incomes")}</div>
-              <div className="text-lg font-semibold text-green-600">+{income.toLocaleString("ru-RU")} ₽</div>
+              <div className="text-lg font-semibold text-green-600">
+                +{income.toLocaleString(localeMap[locale] || "ru-RU")} ₽
+              </div>
             </div>
             <div className="text-center">
               <div className="text-sm text-muted-foreground">{t("calendar.expenses")}</div>
-              <div className="text-lg font-semibold text-red-600">-{expense.toLocaleString("ru-RU")} ₽</div>
+              <div className="text-lg font-semibold text-red-600">
+                -{expense.toLocaleString(localeMap[locale] || "ru-RU")} ₽
+              </div>
             </div>
             <div className="text-center">
               <div className="text-sm text-muted-foreground">{t("common.total")}</div>
               <div className={`text-lg font-semibold ${total >= 0 ? "text-green-600" : "text-red-600"}`}>
                 {total >= 0 ? "+" : ""}
-                {total.toLocaleString("ru-RU")} ₽
+                {total.toLocaleString(localeMap[locale] || "ru-RU")} ₽
               </div>
             </div>
           </div>
@@ -192,7 +202,7 @@ export function DayTransactionsModal({
                           )}
                         </div>
                         <Badge variant="secondary" className="text-xs">
-                          {transaction.categoryCode}
+                          {transaction.category}
                         </Badge>
                       </div>
                       <div className="space-y-2">
@@ -236,7 +246,7 @@ export function DayTransactionsModal({
                         <div>
                           <div className="font-medium">{transaction.description}</div>
                           <Badge variant="secondary" className="text-xs">
-                            {transaction.categoryCode}
+                            {transaction.category}
                           </Badge>
                         </div>
                       </div>
@@ -245,7 +255,7 @@ export function DayTransactionsModal({
                           className={`font-semibold ${transaction.type === "INCOME" ? "text-green-600" : "text-red-600"}`}
                         >
                           {transaction.type === "INCOME" ? "+" : "-"}
-                          {transaction.amount.toLocaleString("ru-RU")} ₽
+                          {transaction.amount.toLocaleString(localeMap[locale] || "ru-RU")} ₽
                         </div>
                         <div className="flex gap-1">
                           <Button size="sm" variant="ghost" onClick={() => startEdit(transaction)}>
