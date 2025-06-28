@@ -21,7 +21,7 @@
     "name": "Name",
     "type": "Type",
     "code": "Code",
-    "optional": "Optional"
+    "optional": "optional"
   },
   "auth": {
     "login": "Login",
@@ -97,7 +97,8 @@
     "createError": "Failed to create transaction",
     "updateError": "Failed to update transaction",
     "deleteError": "Failed to delete transaction",
-    "loadCategoriesError": "Failed to load categories"
+    "loadCategoriesError": "Failed to load categories",
+    "transaction": "transaction"
   },
   "months": {
     "january": "January",

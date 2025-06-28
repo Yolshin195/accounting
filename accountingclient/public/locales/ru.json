@@ -97,7 +97,8 @@
     "createError": "Не удалось создать транзакцию",
     "updateError": "Не удалось обновить транзакцию",
     "deleteError": "Не удалось удалить транзакцию",
-    "loadCategoriesError": "Не удалось загрузить категории"
+    "loadCategoriesError": "Не удалось загрузить категории",
+    "transaction": "транзакция"
   },
   "months": {
     "january": "Январь",

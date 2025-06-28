@@ -97,7 +97,8 @@
     "createError": "ไม่สามารถสร้างรายการได้",
     "updateError": "ไม่สามารถอัปเดตรายการได้",
     "deleteError": "ไม่สามารถลบรายการได้",
-    "loadCategoriesError": "ไม่สามารถโหลดหมวดหมู่ได้"
+    "loadCategoriesError": "ไม่สามารถโหลดหมวดหมู่ได้",
+    "transaction": "รายการ"
   },
   "months": {
     "january": "มกราคม",

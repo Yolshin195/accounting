@@ -97,9 +97,9 @@ export const getTransactions = async (page = 0, size = 10) => {
 
 export const createExpenseTransaction = async (transactionData: {
   amount: number
-  description: string
-  category: string // Изменено с categoryCode на category
-  date?: string // Сделать необязательным
+  description?: string // Сделать необязательным
+  category: string
+  date?: string
 }) => {
   const response = await fetch(`${API_BASE_URL}/transactions/expense`, {
     method: "POST",
@@ -111,9 +111,9 @@ export const createExpenseTransaction = async (transactionData: {
 
 export const createIncomeTransaction = async (transactionData: {
   amount: number
-  description: string
-  category: string // Изменено с categoryCode на category
-  date?: string // Сделать необязательным
+  description?: string // Сделать необязательным
+  category: string
+  date?: string
 }) => {
   const response = await fetch(`${API_BASE_URL}/transactions/income`, {
     method: "POST",
@@ -127,8 +127,8 @@ export const updateTransaction = async (
   id: string,
   transactionData: {
     amount: number
-    description: string
-    category: string // Изменено с categoryCode на category
+    description?: string // Сделать необязательным
+    category: string
     date: string
   },
 ) => {

@@ -25,7 +25,7 @@ interface Transaction {
   id: string
   amount: number
   description: string
-  category: string // Изменено с categoryCode на category
+  category: string
   type: "INCOME" | "EXPENSE"
   date: string
 }
@@ -88,8 +88,12 @@ export function TransactionModal({
     try {
       const transactionData: any = {
         amount: Number.parseFloat(amount),
-        description,
-        category: categoryCode, // Изменено с categoryCode на category
+        category: categoryCode,
+      }
+
+      // Добавляем описание только если оно заполнено
+      if (description.trim()) {
+        transactionData.description = description.trim()
       }
 
       // Добавляем дату только если она не сегодняшняя или если дата была выбрана
@@ -177,14 +181,15 @@ export function TransactionModal({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">{t("common.description")}</Label>
+              <Label htmlFor="description">
+                {t("common.description")} ({t("common.optional")})
+              </Label>
               <Textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder={t("transactions.transactionDescription")}
                 rows={3}
-                required
               />
             </div>
           </div>

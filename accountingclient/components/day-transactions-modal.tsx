@@ -14,8 +14,8 @@ import { updateTransaction, deleteTransaction } from "@/lib/api"
 interface Transaction {
   id: string
   amount: number
-  description: string
-  category: string // Изменено с categoryCode на category
+  description?: string // Сделать необязательным
+  category: string
   type: "INCOME" | "EXPENSE"
   date: string
 }
@@ -63,7 +63,7 @@ export function DayTransactionsModal({
   const startEdit = (transaction: Transaction) => {
     setEditingId(transaction.id)
     setEditAmount(transaction.amount.toString())
-    setEditDescription(transaction.description)
+    setEditDescription(transaction.description || "")
   }
 
   const cancelEdit = () => {
@@ -74,11 +74,15 @@ export function DayTransactionsModal({
 
   const saveEdit = async (transaction: Transaction) => {
     try {
-      const updatedData = {
+      const updatedData: any = {
         amount: Number.parseFloat(editAmount),
-        description: editDescription,
-        category: transaction.category, // Изменено с categoryCode на category
+        category: transaction.category,
         date: transaction.date,
+      }
+
+      // Добавляем описание только если оно заполнено
+      if (editDescription.trim()) {
+        updatedData.description = editDescription.trim()
       }
 
       const updatedTransaction = await updateTransaction(transaction.id, updatedData)
@@ -216,7 +220,7 @@ export function DayTransactionsModal({
                         <Textarea
                           value={editDescription}
                           onChange={(e) => setEditDescription(e.target.value)}
-                          placeholder={t("common.description")}
+                          placeholder={`${t("common.description")} (${t("common.optional")})`}
                           rows={2}
                         />
                       </div>
@@ -244,7 +248,9 @@ export function DayTransactionsModal({
                           )}
                         </div>
                         <div>
-                          <div className="font-medium">{transaction.description}</div>
+                          <div className="font-medium">
+                            {transaction.description || `${transaction.category} ${t("transactions.transaction")}`}
+                          </div>
                           <Badge variant="secondary" className="text-xs">
                             {transaction.category}
                           </Badge>

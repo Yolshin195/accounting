@@ -13,8 +13,8 @@ import { getTransactions } from "@/lib/api"
 interface Transaction {
   id: string
   amount: number
-  description: string
-  category: string // Изменено с categoryCode на category
+  description?: string // Сделать необязательным
+  category: string
   type: "INCOME" | "EXPENSE"
   date: string
   createdAt: string
