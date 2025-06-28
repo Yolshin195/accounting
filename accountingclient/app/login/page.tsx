@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Loader2, LogIn } from "lucide-react"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
+  const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
@@ -26,12 +26,15 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      await login(email, password)
+      await login(username, password)
       toast({
         title: "Успешный вход",
         description: "Добро пожаловать!",
       })
-      router.push("/dashboard/categories")
+      // Принудительный переход после небольшой задержки
+      setTimeout(() => {
+        router.push("/dashboard/calendar")
+      }, 100)
     } catch (error: any) {
       toast({
         title: "Ошибка входа",
@@ -56,13 +59,13 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Имя пользователя</Label>
               <Input
-                id="email"
+                id="username"
                 type="text"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>

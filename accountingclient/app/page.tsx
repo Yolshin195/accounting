@@ -11,10 +11,13 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!loading) {
-      if (user) {
-        router.push("/dashboard/categories")
+      // Дополнительная проверка токена
+      const token = localStorage.getItem("token")
+
+      if (user && token) {
+        router.replace("/dashboard/categories")
       } else {
-        router.push("/login")
+        router.replace("/login")
       }
     }
   }, [user, loading, router])

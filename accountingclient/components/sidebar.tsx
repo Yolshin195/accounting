@@ -54,7 +54,7 @@ export function Sidebar() {
             <User className="h-4 w-4" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{user?.name || user?.email}</p>
+            <p className="text-sm font-medium truncate">{user?.username}</p>
           </div>
         </div>
         <Button variant="outline" size="sm" onClick={logout} className="w-full justify-start bg-transparent">

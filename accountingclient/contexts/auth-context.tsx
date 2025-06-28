@@ -4,15 +4,13 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from "
 import { loginUser, registerUser } from "@/lib/api"
 
 interface User {
-  id: string
-  email: string
-  name: string
+  username: string
 }
 
 interface AuthContextType {
   user: User | null
   loading: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (username: string, password: string) => Promise<void>
   register: (email: string, password: string, name: string) => Promise<void>
   logout: () => void
 }
@@ -26,36 +24,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Check for existing token on mount
     const token = localStorage.getItem("token")
-    const userData = localStorage.getItem("user")
+    const username = localStorage.getItem("username")
 
-    if (token && userData) {
-      try {
-        setUser(JSON.parse(userData))
-      } catch (error) {
-        localStorage.removeItem("token")
-        localStorage.removeItem("user")
-      }
+    if (token && username) {
+      setUser({ username })
     }
     setLoading(false)
   }, [])
 
-  const login = async (email: string, password: string) => {
-    const response = await loginUser(email, password)
+  const login = async (username: string, password: string) => {
+    const response = await loginUser(username, password)
     localStorage.setItem("token", response.token)
-    localStorage.setItem("user", JSON.stringify(response.user))
-    setUser(response.user)
+    localStorage.setItem("username", username)
+    setUser({ username })
   }
 
   const register = async (email: string, password: string, name: string) => {
     const response = await registerUser(email, password, name)
     localStorage.setItem("token", response.token)
-    localStorage.setItem("user", JSON.stringify(response.user))
-    setUser(response.user)
+    localStorage.setItem("username", name) // Используем name как username
+    setUser({ username: name })
   }
 
   const logout = () => {
     localStorage.removeItem("token")
-    localStorage.removeItem("user")
+    localStorage.removeItem("username")
     setUser(null)
   }
 
@@ -64,7 +57,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  console.log(context)
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider")
   }

@@ -43,7 +43,10 @@ export default function RegisterPage() {
         title: "Регистрация успешна",
         description: "Добро пожаловать!",
       })
-      router.push("/dashboard/categories")
+      // Принудительный переход после небольшой задержки
+      setTimeout(() => {
+        router.push("/dashboard/categories")
+      }, 100)
     } catch (error: any) {
       toast({
         title: "Ошибка регистрации",
