@@ -9,11 +9,12 @@ import { DayTransactionsModal } from "@/components/day-transactions-modal"
 import { useToast } from "@/hooks/use-toast"
 import { useLocale } from "@/contexts/locale-context"
 import { getTransactions } from "@/lib/api"
+import { isSameDay, isSameMonth } from "@/lib/date-utils"
 
 interface Transaction {
   id: string
   amount: number
-  description?: string // Сделать необязательным
+  description?: string
   category: string
   type: "INCOME" | "EXPENSE"
   date: string
@@ -50,11 +51,8 @@ export default function CalendarPage() {
       // Загружаем транзакции за текущий месяц
       const response = await getTransactions(0, 100) // Загружаем больше для фильтрации
       const monthTransactions = (response.content || response).filter((t: Transaction) => {
-        const transactionDate = new Date(t.date)
-        return (
-          transactionDate.getMonth() === currentDate.getMonth() &&
-          transactionDate.getFullYear() === currentDate.getFullYear()
-        )
+        // Конвертируем UTC дату в локальную и сравниваем месяц
+        return isSameMonth(t.date, currentDate)
       })
       setTransactions(monthTransactions)
     } catch (error: any) {
@@ -92,8 +90,7 @@ export default function CalendarPage() {
   }
 
   const getTransactionsForDate = (date: Date) => {
-    const dateStr = date.toISOString().split("T")[0]
-    return transactions.filter((t) => t.date.startsWith(dateStr))
+    return transactions.filter((t) => isSameDay(t.date, date))
   }
 
   const getTotalForDate = (date: Date) => {
@@ -214,7 +211,7 @@ export default function CalendarPage() {
 
               const dayTransactions = getTransactionsForDate(date)
               const total = getTotalForDate(date)
-              const isToday = date.toDateString() === new Date().toDateString()
+              const isToday = isSameDay(new Date(), date)
 
               return (
                 <div

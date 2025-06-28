@@ -19,6 +19,7 @@ import {
 import { useToast } from "@/hooks/use-toast"
 import { useLocale } from "@/contexts/locale-context"
 import { createIncomeTransaction, createExpenseTransaction, getCategories } from "@/lib/api"
+import { formatDateForLocale } from "@/lib/date-utils"
 import { Loader2 } from "lucide-react"
 
 interface Transaction {
@@ -133,15 +134,6 @@ export function TransactionModal({
     }
   }
 
-  const formatDate = (date: Date) => {
-    const localeMap = {
-      en: "en-US",
-      th: "th-TH",
-      ru: "ru-RU",
-    }
-    return date.toLocaleDateString(localeMap[locale] || "ru-RU")
-  }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -149,7 +141,9 @@ export function TransactionModal({
           <DialogTitle>
             {type === "INCOME" ? t("transactions.addIncomeTitle") : t("transactions.addExpenseTitle")}
           </DialogTitle>
-          <DialogDescription>{selectedDate && `${t("common.date")}: ${formatDate(selectedDate)}`}</DialogDescription>
+          <DialogDescription>
+            {selectedDate && `${t("common.date")}: ${formatDateForLocale(selectedDate, locale)}`}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4 py-4">

@@ -10,11 +10,12 @@ import { Plus, TrendingUp, TrendingDown, Edit, Trash2, Save, X } from "lucide-re
 import { useToast } from "@/hooks/use-toast"
 import { useLocale } from "@/contexts/locale-context"
 import { updateTransaction, deleteTransaction } from "@/lib/api"
+import { formatDateForLocale } from "@/lib/date-utils"
 
 interface Transaction {
   id: string
   amount: number
-  description?: string // Сделать необязательным
+  description?: string
   category: string
   type: "INCOME" | "EXPENSE"
   date: string
@@ -120,20 +121,18 @@ export function DayTransactionsModal({
     }
   }
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString(localeMap[locale] || "ru-RU", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{formatDate(date)}</DialogTitle>
+          <DialogTitle>
+            {formatDateForLocale(date, locale, {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </DialogTitle>
           <DialogDescription>{t("calendar.transactionsForDay")}</DialogDescription>
         </DialogHeader>
 
