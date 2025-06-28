@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
+import { useLocale } from "@/contexts/locale-context"
 import { createCategory } from "@/lib/api"
 import { Loader2 } from "lucide-react"
 
@@ -41,6 +42,7 @@ export function CategoryModal({ open, onOpenChange, onCategoryCreated }: Categor
   const [description, setDescription] = useState("")
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
+  const { t } = useLocale()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -64,13 +66,13 @@ export function CategoryModal({ open, onOpenChange, onCategoryCreated }: Categor
       setDescription("")
 
       toast({
-        title: "Успешно",
-        description: "Категория создана",
+        title: t("categories.createSuccess"),
+        description: t("categories.createSuccess"),
       })
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось создать категорию",
+        title: t("errors.unknownError"),
+        description: error.message || t("categories.createError"),
         variant: "destructive",
       })
     } finally {
@@ -82,61 +84,61 @@ export function CategoryModal({ open, onOpenChange, onCategoryCreated }: Categor
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Добавить категорию</DialogTitle>
-          <DialogDescription>Создайте новую категорию для классификации доходов или расходов</DialogDescription>
+          <DialogTitle>{t("categories.addCategoryTitle")}</DialogTitle>
+          <DialogDescription>{t("categories.addCategoryDescription")}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="code">Код категории</Label>
+              <Label htmlFor="code">{t("categories.categoryCode")}</Label>
               <Input
                 id="code"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder="FOOD, TRANSPORT, SALARY..."
+                placeholder={t("categories.categoryCodePlaceholder")}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="name">Название</Label>
+              <Label htmlFor="name">{t("categories.categoryName")}</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Например: Продукты"
+                placeholder={t("categories.categoryNamePlaceholder")}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="type">Тип</Label>
+              <Label htmlFor="type">{t("categories.categoryType")}</Label>
               <Select value={type} onValueChange={(value: "INCOME" | "EXPENSE") => setType(value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="EXPENSE">Расход</SelectItem>
-                  <SelectItem value="INCOME">Доход</SelectItem>
+                  <SelectItem value="EXPENSE">{t("common.expense")}</SelectItem>
+                  <SelectItem value="INCOME">{t("common.income")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Описание (необязательно)</Label>
+              <Label htmlFor="description">{t("categories.categoryDescription")}</Label>
               <Textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Описание категории..."
+                placeholder={t("categories.categoryDescriptionPlaceholder")}
                 rows={3}
               />
             </div>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Отмена
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Создать
+              {t("common.create")}
             </Button>
           </DialogFooter>
         </form>

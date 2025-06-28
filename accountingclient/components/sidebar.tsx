@@ -6,17 +6,20 @@ import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useAuth } from "@/contexts/auth-context"
+import { useLocale } from "@/contexts/locale-context"
+import { LanguageSwitcher } from "@/components/language-switcher"
 import { Menu, Tag, Calendar, LogOut, User } from "lucide-react"
-
-const navigation = [
-  { name: "Категории", href: "/dashboard/categories", icon: Tag },
-  { name: "Календарь", href: "/dashboard/calendar", icon: Calendar },
-]
 
 export function Sidebar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user, logout } = useAuth()
+  const { t } = useLocale()
   const pathname = usePathname()
+
+  const navigation = [
+    { name: t("navigation.categories"), href: "/dashboard/categories", icon: Tag },
+    { name: t("navigation.calendar"), href: "/dashboard/calendar", icon: Calendar },
+  ]
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -48,8 +51,10 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="border-t p-4">
-        <div className="flex items-center mb-4">
+      <div className="border-t p-4 space-y-4">
+        <LanguageSwitcher />
+
+        <div className="flex items-center">
           <div className="flex items-center justify-center w-8 h-8 bg-primary text-primary-foreground rounded-full mr-3">
             <User className="h-4 w-4" />
           </div>
@@ -57,9 +62,10 @@ export function Sidebar() {
             <p className="text-sm font-medium truncate">{user?.username}</p>
           </div>
         </div>
+
         <Button variant="outline" size="sm" onClick={logout} className="w-full justify-start bg-transparent">
           <LogOut className="mr-2 h-4 w-4" />
-          Выйти
+          {t("auth.logout")}
         </Button>
       </div>
     </div>

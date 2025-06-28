@@ -1,7 +1,7 @@
 // API functions for interacting with the backend at http://localhost:8888
 // Based on OpenAPI 3.0 specification
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8888"
+const API_BASE_URL = "http://localhost:8888"
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
@@ -15,13 +15,21 @@ const getAuthHeaders = () => {
 // Helper function to handle API responses
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
+    // Если получили 401 (Unauthorized), очищаем токен и перенаправляем на логин
+    if (response.status === 401) {
+      localStorage.removeItem("token")
+      localStorage.removeItem("username")
+      window.location.href = "/login"
+      return
+    }
+
     const errorData = await response.json().catch(() => ({ message: "Network error" }))
     throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
   }
   return response.json()
 }
 
-// Auth API
+// Auth API (БЕЗ токена)
 export const loginUser = async (username: string, password: string) => {
   const response = await fetch(`${API_BASE_URL}/users/login`, {
     method: "POST",
@@ -40,7 +48,7 @@ export const registerUser = async (email: string, password: string, name: string
   return handleResponse(response)
 }
 
-// Categories API
+// Categories API (С токеном)
 export const getCategories = async (page = 0, size = 10) => {
   const response = await fetch(`${API_BASE_URL}/categories?page=${page}&size=${size}`, {
     headers: getAuthHeaders(),
@@ -68,12 +76,18 @@ export const deleteCategory = async (code: string) => {
     headers: getAuthHeaders(),
   })
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem("token")
+      localStorage.removeItem("username")
+      window.location.href = "/login"
+      return
+    }
     const errorData = await response.json().catch(() => ({ message: "Network error" }))
     throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
   }
 }
 
-// Transactions API
+// Transactions API (С токеном)
 export const getTransactions = async (page = 0, size = 10) => {
   const response = await fetch(`${API_BASE_URL}/transactions?page=${page}&size=${size}`, {
     headers: getAuthHeaders(),
@@ -132,6 +146,12 @@ export const deleteTransaction = async (id: string) => {
     headers: getAuthHeaders(),
   })
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem("token")
+      localStorage.removeItem("username")
+      window.location.href = "/login"
+      return
+    }
     const errorData = await response.json().catch(() => ({ message: "Network error" }))
     throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
   }

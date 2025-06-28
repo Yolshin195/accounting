@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react"
 import { TransactionModal } from "@/components/transaction-modal"
 import { DayTransactionsModal } from "@/components/day-transactions-modal"
 import { useToast } from "@/hooks/use-toast"
+import { useLocale } from "@/contexts/locale-context"
 import { getTransactions } from "@/lib/api"
 
 interface Transaction {
@@ -28,6 +29,7 @@ export default function CalendarPage() {
   const [dayModalOpen, setDayModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
+  const { t } = useLocale()
 
   useEffect(() => {
     loadTransactions()
@@ -48,8 +50,8 @@ export default function CalendarPage() {
       setTransactions(monthTransactions)
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось загрузить транзакции",
+        title: t("errors.unknownError"),
+        description: error.message || t("calendar.loadError"),
         variant: "destructive",
       })
     } finally {
@@ -128,34 +130,45 @@ export default function CalendarPage() {
   }
 
   const days = getDaysInMonth(currentDate)
+
+  // Локализованные названия месяцев и дней
   const monthNames = [
-    "Январь",
-    "Февраль",
-    "Март",
-    "Апрель",
-    "Май",
-    "Июнь",
-    "Июль",
-    "Август",
-    "Сентябрь",
-    "Октябрь",
-    "Ноябрь",
-    "Декабрь",
+    t("months.january"),
+    t("months.february"),
+    t("months.march"),
+    t("months.april"),
+    t("months.may"),
+    t("months.june"),
+    t("months.july"),
+    t("months.august"),
+    t("months.september"),
+    t("months.october"),
+    t("months.november"),
+    t("months.december"),
   ]
-  const dayNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"]
+
+  const dayNames = [
+    t("days.sunday"),
+    t("days.monday"),
+    t("days.tuesday"),
+    t("days.wednesday"),
+    t("days.thursday"),
+    t("days.friday"),
+    t("days.saturday"),
+  ]
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Календарь</h1>
-          <p className="text-muted-foreground">Отслеживайте доходы и расходы по дням</p>
+          <h1 className="text-3xl font-bold">{t("calendar.title")}</h1>
+          <p className="text-muted-foreground">{t("calendar.description")}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => handleAddTransaction("EXPENSE")}>
-            Добавить расход
+            {t("calendar.addExpense")}
           </Button>
-          <Button onClick={() => handleAddTransaction("INCOME")}>Добавить доход</Button>
+          <Button onClick={() => handleAddTransaction("INCOME")}>{t("calendar.addIncome")}</Button>
         </div>
       </div>
 

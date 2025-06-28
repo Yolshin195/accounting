@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/contexts/auth-context"
+import { useLocale } from "@/contexts/locale-context"
+import { LanguageSwitcher } from "@/components/language-switcher"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2, UserPlus } from "lucide-react"
 
@@ -20,6 +22,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("")
   const [loading, setLoading] = useState(false)
   const { register } = useAuth()
+  const { t } = useLocale()
   const { toast } = useToast()
   const router = useRouter()
 
@@ -28,8 +31,8 @@ export default function RegisterPage() {
 
     if (password !== confirmPassword) {
       toast({
-        title: "Ошибка",
-        description: "Пароли не совпадают",
+        title: t("errors.unknownError"),
+        description: t("auth.passwordMismatch"),
         variant: "destructive",
       })
       return
@@ -40,17 +43,16 @@ export default function RegisterPage() {
     try {
       await register(email, password, name)
       toast({
-        title: "Регистрация успешна",
-        description: "Добро пожаловать!",
+        title: t("auth.registerSuccess"),
+        description: t("auth.welcome"),
       })
-      // Принудительный переход после небольшой задержки
       setTimeout(() => {
         router.push("/dashboard/categories")
       }, 100)
     } catch (error: any) {
       toast({
-        title: "Ошибка регистрации",
-        description: error.message || "Попробуйте еще раз",
+        title: t("auth.registerError"),
+        description: error.message || t("auth.tryAgain"),
         variant: "destructive",
       })
     } finally {
@@ -60,29 +62,33 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
+
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
             <UserPlus className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl text-center">Регистрация</CardTitle>
-          <CardDescription className="text-center">Создайте новый аккаунт</CardDescription>
+          <CardTitle className="text-2xl text-center">{t("auth.registerTitle")}</CardTitle>
+          <CardDescription className="text-center">{t("auth.registerDescription")}</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Имя</Label>
+              <Label htmlFor="name">{t("common.name")}</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Ваше имя"
+                placeholder={t("common.name")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("auth.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -93,7 +99,7 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Пароль</Label>
+              <Label htmlFor="password">{t("auth.password")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -103,7 +109,7 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Повторите пароль</Label>
+              <Label htmlFor="confirmPassword">{t("auth.confirmPassword")}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -116,12 +122,12 @@ export default function RegisterPage() {
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Зарегистрироваться
+              {t("auth.register")}
             </Button>
             <p className="text-sm text-center text-muted-foreground">
-              Уже есть аккаунт?{" "}
+              {t("auth.haveAccount")}{" "}
               <Link href="/login" className="text-primary hover:underline">
-                Войти
+                {t("auth.login")}
               </Link>
             </p>
           </CardFooter>

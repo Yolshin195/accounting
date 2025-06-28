@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  # Если у вас есть backend на порту 8888
+  backend:
+    image: your-backend-image:latest  # Замените на ваш backend образ
+    ports:
+      - "8888:8888"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

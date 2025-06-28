@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, Trash2, Tag, Loader2 } from "lucide-react"
 import { CategoryModal } from "@/components/category-modal"
 import { useToast } from "@/hooks/use-toast"
+import { useLocale } from "@/contexts/locale-context"
 import { getCategories, deleteCategory } from "@/lib/api"
 
 interface Category {
@@ -24,6 +25,7 @@ export default function CategoriesPage() {
   const [page, setPage] = useState(0)
   const [hasMore, setHasMore] = useState(true)
   const { toast } = useToast()
+  const { t } = useLocale()
 
   useEffect(() => {
     loadCategories()
@@ -44,8 +46,8 @@ export default function CategoriesPage() {
       setPage(pageNum)
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось загрузить категории",
+        title: t("errors.unknownError"),
+        description: error.message || t("categories.loadError"),
         variant: "destructive",
       })
     } finally {
@@ -58,13 +60,13 @@ export default function CategoriesPage() {
       await deleteCategory(code)
       setCategories(categories.filter((cat) => cat.code !== code))
       toast({
-        title: "Успешно",
-        description: "Категория удалена",
+        title: t("categories.deleteSuccess"),
+        description: t("categories.deleteSuccess"),
       })
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось удалить категорию",
+        title: t("errors.unknownError"),
+        description: error.message || t("categories.deleteError"),
         variant: "destructive",
       })
     }
@@ -85,12 +87,12 @@ export default function CategoriesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Категории</h1>
-          <p className="text-muted-foreground">Управляйте категориями доходов и расходов</p>
+          <h1 className="text-3xl font-bold">{t("categories.title")}</h1>
+          <p className="text-muted-foreground">{t("categories.description")}</p>
         </div>
         <Button onClick={() => setModalOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Добавить категорию
+          {t("categories.addCategory")}
         </Button>
       </div>
 
@@ -111,13 +113,11 @@ export default function CategoriesPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Tag className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Нет категорий</h3>
-            <p className="text-muted-foreground text-center mb-4">
-              Создайте первую категорию для отслеживания доходов и расходов
-            </p>
+            <h3 className="text-lg font-semibold mb-2">{t("categories.noCategories")}</h3>
+            <p className="text-muted-foreground text-center mb-4">{t("categories.noCategoriesDescription")}</p>
             <Button onClick={() => setModalOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
-              Добавить категорию
+              {t("categories.addCategory")}
             </Button>
           </CardContent>
         </Card>
@@ -144,9 +144,11 @@ export default function CategoriesPage() {
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <Badge variant={category.type === "INCOME" ? "default" : "secondary"}>
-                    {category.type === "INCOME" ? "Доход" : "Расход"}
+                    {category.type === "INCOME" ? t("common.income") : t("common.expense")}
                   </Badge>
-                  <p className="text-sm text-muted-foreground">Код: {category.code}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t("common.code")}: {category.code}
+                  </p>
                   {category.description && <p className="text-sm text-muted-foreground">{category.description}</p>}
                 </CardContent>
               </Card>
@@ -157,7 +159,7 @@ export default function CategoriesPage() {
             <div className="flex justify-center">
               <Button variant="outline" onClick={loadMore} disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Загрузить еще
+                {t("categories.loadMore")}
               </Button>
             </div>
           )}

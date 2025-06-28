@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
+import { useLocale } from "@/contexts/locale-context"
 import { createIncomeTransaction, createExpenseTransaction, getCategories } from "@/lib/api"
 import { Loader2 } from "lucide-react"
 
@@ -57,6 +58,7 @@ export function TransactionModal({
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
+  const { t } = useLocale()
 
   useEffect(() => {
     if (open) {
@@ -72,8 +74,8 @@ export function TransactionModal({
       setCategories(filteredCategories)
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось загрузить категории",
+        title: t("errors.unknownError"),
+        description: error.message || t("transactions.loadCategoriesError"),
         variant: "destructive",
       })
     }
@@ -106,13 +108,13 @@ export function TransactionModal({
       setCategoryCode("")
 
       toast({
-        title: "Успешно",
-        description: `${type === "INCOME" ? "Доход" : "Расход"} добавлен`,
+        title: t("transactions.createSuccess"),
+        description: t("transactions.createSuccess"),
       })
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось создать транзакцию",
+        title: t("errors.unknownError"),
+        description: error.message || t("transactions.createError"),
         variant: "destructive",
       })
     } finally {
@@ -120,17 +122,23 @@ export function TransactionModal({
     }
   }
 
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString(t("locale") === "th" ? "th-TH" : t("locale") === "en" ? "en-US" : "ru-RU")
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Добавить {type === "INCOME" ? "доход" : "расход"}</DialogTitle>
-          <DialogDescription>{selectedDate && `Дата: ${selectedDate.toLocaleDateString("ru-RU")}`}</DialogDescription>
+          <DialogTitle>
+            {type === "INCOME" ? t("transactions.addIncomeTitle") : t("transactions.addExpenseTitle")}
+          </DialogTitle>
+          <DialogDescription>{selectedDate && `${t("common.date")}: ${formatDate(selectedDate)}`}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="amount">Сумма</Label>
+              <Label htmlFor="amount">{t("common.amount")}</Label>
               <Input
                 id="amount"
                 type="number"
@@ -142,10 +150,10 @@ export function TransactionModal({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="category">Категория</Label>
+              <Label htmlFor="category">{t("common.category")}</Label>
               <Select value={categoryCode} onValueChange={setCategoryCode} required>
                 <SelectTrigger>
-                  <SelectValue placeholder="Выберите категорию" />
+                  <SelectValue placeholder={t("transactions.selectCategory")} />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((category) => (
@@ -157,12 +165,12 @@ export function TransactionModal({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Описание</Label>
+              <Label htmlFor="description">{t("common.description")}</Label>
               <Textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Описание транзакции..."
+                placeholder={t("transactions.transactionDescription")}
                 rows={3}
                 required
               />
@@ -170,11 +178,11 @@ export function TransactionModal({
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Отмена
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Добавить
+              {t("common.add")}
             </Button>
           </DialogFooter>
         </form>

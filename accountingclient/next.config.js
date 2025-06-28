@@ -9,6 +9,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Добавляем поддержку standalone для Docker
+  output: "standalone",
 }
 
 module.exports = nextConfig
