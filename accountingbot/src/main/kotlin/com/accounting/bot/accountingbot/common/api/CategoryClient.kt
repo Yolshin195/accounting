@@ -70,6 +70,24 @@ class CategoryClient(
         return response.body ?: throw RuntimeException("Get categories failed")
     }
 
+    fun getExpenseCategories(
+        page: Int, size: Int, token: String
+    ): PageCategoryDto {
+        val url = "$baseUrl/categories/expense?page=$page&size=$size"
+        val entity = HttpEntity<Void>(headers(token))
+        val response = restTemplate.exchange(url, HttpMethod.GET, entity, PageCategoryDto::class.java)
+        return response.body ?: throw RuntimeException("Get categories failed")
+    }
+
+    fun getIncomeCategories(
+        page: Int, size: Int, token: String
+    ): PageCategoryDto {
+        val url = "$baseUrl/categories/income?page=$page&size=$size"
+        val entity = HttpEntity<Void>(headers(token))
+        val response = restTemplate.exchange(url, HttpMethod.GET, entity, PageCategoryDto::class.java)
+        return response.body ?: throw RuntimeException("Get categories failed")
+    }
+
     fun createCategory(dto: CreateCategoryDto, token: String): CategoryDto {
         val url = "$baseUrl/categories"
         val entity = HttpEntity(dto, headers(token))

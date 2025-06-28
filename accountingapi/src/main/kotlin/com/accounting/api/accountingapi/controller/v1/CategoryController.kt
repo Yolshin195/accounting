@@ -24,6 +24,22 @@ class CategoryController(
         return ResponseEntity.ok(categories)
     }
 
+    @GetMapping("/expense")
+    fun getExpenseCategories(
+        @PageableDefault(size = 20) pageable: Pageable
+    ): ResponseEntity<Page<CategoryDto>> {
+        val categories = categoryService.getExpenseCategories(pageable)
+        return ResponseEntity.ok(categories)
+    }
+
+    @GetMapping("/income")
+    fun getIncomeCategories(
+        @PageableDefault(size = 20) pageable: Pageable
+    ): ResponseEntity<Page<CategoryDto>> {
+        val categories = categoryService.getIncomeCategories(pageable)
+        return ResponseEntity.ok(categories)
+    }
+
     @PostMapping
     fun createCategory(@RequestBody dto: CreateCategoryDto): ResponseEntity<CategoryDto> {
         val created = categoryService.createCategory(dto)

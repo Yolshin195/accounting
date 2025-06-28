@@ -12,19 +12,18 @@ class MessageSenderImpl(
 ): MessageSender {
 
     override fun sendMessageWithKeyboard(chatId: Long, text: String, keyboard: InlineKeyboardMarkup) {
-        try {
-            val message = SendMessage(chatId.toString(), text)
-            message.replyMarkup = keyboard
-            telegramClient.execute(message)
-        } catch (e: Exception) {
-            println("Ошибка при отправке сообщения с клавиатурой: ${e.message}")
-        }
+        val message = SendMessage(chatId.toString(), text)
+        message.replyMarkup = keyboard
+        send(message)
     }
 
     override fun sendMessage(chatId: Long, text: String) {
+        send(SendMessage(chatId.toString(), text))
+    }
+
+    override fun send(sendMessage: SendMessage) {
         try {
-            val message = SendMessage(chatId.toString(), text)
-            telegramClient.execute(message)
+            telegramClient.execute(sendMessage)
         } catch (e: Exception) {
             println("Ошибка при отправке сообщения: ${e.message}")
             e.printStackTrace()

@@ -2,6 +2,7 @@ package com.accounting.api.accountingapi.service.impl
 
 import com.accounting.api.accountingapi.common.dto.CategoryDto
 import com.accounting.api.accountingapi.common.dto.CreateCategoryDto
+import com.accounting.api.accountingapi.common.dto.transaction.TransactionTypeEnum
 import com.accounting.api.accountingapi.common.entity.CategoryEntity
 import com.accounting.api.accountingapi.repository.CategoryRepository
 import com.accounting.api.accountingapi.service.CategoryService
@@ -21,6 +22,36 @@ class CategoryServiceImpl(
     override fun getAllCategories(pageable: Pageable): Page<CategoryDto> {
         val user = currentUserService.getCurrentUser()
         val page = categoryRepository.findAllByUser(user, pageable)
+        val dtoList = page.content.map {
+            CategoryDto(
+                id = it.id!!,
+                code = it.code,
+                name = it.name,
+                description = it.description,
+                type = it.type
+            )
+        }
+        return PageImpl(dtoList, pageable, page.totalElements)
+    }
+
+    override fun getExpenseCategories(pageable: Pageable): Page<CategoryDto> {
+        val user = currentUserService.getCurrentUser()
+        val page = categoryRepository.findAllByUserAndType(user, TransactionTypeEnum.EXPENSE, pageable)
+        val dtoList = page.content.map {
+            CategoryDto(
+                id = it.id!!,
+                code = it.code,
+                name = it.name,
+                description = it.description,
+                type = it.type
+            )
+        }
+        return PageImpl(dtoList, pageable, page.totalElements)
+    }
+
+    override fun getIncomeCategories(pageable: Pageable): Page<CategoryDto> {
+        val user = currentUserService.getCurrentUser()
+        val page = categoryRepository.findAllByUserAndType(user, TransactionTypeEnum.INCOME, pageable)
         val dtoList = page.content.map {
             CategoryDto(
                 id = it.id!!,

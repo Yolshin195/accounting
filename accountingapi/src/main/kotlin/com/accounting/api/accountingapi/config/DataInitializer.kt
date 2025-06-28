@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.security.crypto.password.PasswordEncoder
 
 
-@Configuration
+//@Configuration
 class DataInitializer(
     private val userProfileRepository: UserProfileRepository,
     private val passwordEncoder: PasswordEncoder,
