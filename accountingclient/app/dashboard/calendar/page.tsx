@@ -18,7 +18,6 @@ interface Transaction {
   category: string
   type: "INCOME" | "EXPENSE"
   date: string
-  createdAt: string
 }
 
 export default function CalendarPage() {

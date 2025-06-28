@@ -1,7 +1,7 @@
 // API functions for interacting with the backend at http://localhost:8888
 // Based on OpenAPI 3.0 specification
 
-const API_BASE_URL = "http://localhost:8888"
+const API_BASE_URL = "/api/backend"
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
