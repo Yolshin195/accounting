@@ -2,6 +2,7 @@ package com.accounting.api.accountingapi.security
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -32,9 +33,13 @@ class SecurityConfig(
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http.csrf { it.disable() }
+        http
+            .cors { }
+            .csrf { it.disable() }
             .authorizeHttpRequests { auth ->
-                auth.requestMatchers(
+                auth
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .requestMatchers(
                     "/users/register",
                     "/users/login",
                     "/users/login/telegram",

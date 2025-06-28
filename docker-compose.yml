@@ -5,7 +5,7 @@ services:
     build:
       context: ./accountingapi
     ports:
-      - "8080:8080"
+      - "8888:8080"
     container_name: accounting-api-container
     environment:
       - SPRING_PROFILES_ACTIVE=docker
@@ -62,7 +62,7 @@ services:
     container_name: accounting-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis-data:/data
 
