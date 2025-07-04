@@ -28,6 +28,17 @@ class TransactionController(
         return ResponseEntity.ok(page)
     }
 
+    @GetMapping("/month")
+    fun getTransactionsByYearAndMonth(
+        @RequestParam year: Int,
+        @RequestParam month: Int
+    ): ResponseEntity<Page<TransactionDto>> {
+        require(month in 1..12) { "Месяц должен быть в диапазоне от 1 до 12" }
+        val transactions = transactionService.getTransactionsByYearAndMonth(year, month)
+        return ResponseEntity.ok(transactions)
+    }
+
+
     @GetMapping("/{id}")
     fun getTransactionById(@PathVariable id: UUID): ResponseEntity<TransactionDto> {
         val transaction = transactionService.getTransactionById(id)

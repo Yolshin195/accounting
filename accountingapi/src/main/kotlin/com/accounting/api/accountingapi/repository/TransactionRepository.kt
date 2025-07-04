@@ -28,4 +28,18 @@ interface TransactionRepository : JpaRepository<TransactionEntity, UUID> {
         @Param("startOfDay") startOfDay: Instant,
         @Param("endOfDay") endOfDay: Instant
     ): List<CategoryExpenseSummary>
+
+    @Query("""
+        SELECT t FROM TransactionEntity t
+        WHERE t.user = :user 
+        AND YEAR(t.createdAt) = :year 
+        AND MONTH(t.createdAt) = :month
+    """)
+    fun findAllByYearAndMonth(
+        @Param("user") user: UserProfileEntity,
+        @Param("year") year: Int,
+        @Param("month") month: Int,
+        pageable: Pageable
+    ): Page<TransactionEntity>
+
 }

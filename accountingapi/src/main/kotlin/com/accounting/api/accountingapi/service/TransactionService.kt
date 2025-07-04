@@ -7,6 +7,7 @@ import java.util.*
 
 interface TransactionService {
     fun getAllTransactions(pageable: Pageable): Page<TransactionDto>
+    fun getTransactionsByYearAndMonth(year: Int, month: Int): Page<TransactionDto>
     fun getTransactionById(id: UUID): TransactionDto
     fun createExpense(dto: CreateExpenseDto): TransactionDto
     fun createIncome(dto: CreateIncomeDto): TransactionDto

@@ -38,6 +38,10 @@ class TransactionServiceImpl(
         return PageImpl(dtoList, pageable, page.totalElements)
     }
 
+    override fun getTransactionsByYearAndMonth(year: Int, month: Int): Page<TransactionDto> {
+        TODO("Not yet implemented")
+    }
+
     override fun getTransactionById(id: UUID): TransactionDto {
         val tx = transactionRepository.findById(id).orElseThrow { NoSuchElementException("Transaction not found") }
         return TransactionDto(
