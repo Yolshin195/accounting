@@ -2,7 +2,7 @@ use crate::application::dtos::category_dto::{CategoryDto, CreateCategoryDto};
 use crate::application::traits::category_repo::CategoryRepository;
 use crate::domain::category::{Category, CategoryType};
 use uuid::Uuid;
-use crate::application::dtos::pagination_dto::Pagination;
+use crate::application::dtos::pagination_dto::{PagedResponse, Pagination};
 
 #[derive(Clone)]
 pub struct CategoryService<R: CategoryRepository> {
@@ -46,9 +46,9 @@ impl<R: CategoryRepository> CategoryService<R> {
         })
     }
 
-    pub async fn get_all(&self, user_id: Uuid, pagination: Pagination) -> anyhow::Result<Vec<CategoryDto>> {
-        let list = self.repo.find_all(user_id, pagination).await?;
-        Ok(list
+    pub async fn get_all(&self, user_id: Uuid, pagination: Pagination) -> anyhow::Result<PagedResponse<CategoryDto>> {
+        let list = self.repo.find_all(user_id, pagination.clone()).await?;
+        let list_dto = list
             .into_iter()
             .map(|cat| CategoryDto {
                 id: cat.id.to_string(),
@@ -60,6 +60,8 @@ impl<R: CategoryRepository> CategoryService<R> {
                     CategoryType::Expense => "EXPENSE".into(),
                 },
             })
-            .collect())
+            .collect();
+        let response = PagedResponse::new(list_dto, &pagination, 100);
+        Ok(response)
     }
 }

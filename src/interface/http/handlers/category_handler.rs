@@ -3,7 +3,7 @@ use crate::domain::user::User;
 use crate::infrastructure::app_state::CategoryAppState;
 use axum::{Extension, Json, extract::State, extract::Query};
 use std::sync::Arc;
-use crate::application::dtos::pagination_dto::Pagination;
+use crate::application::dtos::pagination_dto::{PagedResponse, Pagination};
 
 pub async fn create_category(
     State(state): State<Arc<CategoryAppState>>,
@@ -22,7 +22,7 @@ pub async fn list_categories(
     State(state): State<Arc<CategoryAppState>>,
     Query(pagination): Query<Pagination>,
     Extension(user): Extension<User>,
-) -> Json<Vec<CategoryDto>> {
-    let list = state.category_service.get_all(user.id, pagination).await.unwrap();
-    Json(list)
+) -> Json<PagedResponse<CategoryDto>> {
+    let page = state.category_service.get_all(user.id, pagination).await.unwrap();
+    Json(page)
 }

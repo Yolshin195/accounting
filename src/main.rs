@@ -63,7 +63,7 @@ async fn main() -> anyhow::Result<()> {
     });
 
     let private_router = Router::new()
-        .nest("/category", category_routes(Arc::new(category_app_state)))
+        .nest("/categories", category_routes(Arc::new(category_app_state)))
         .layer(middleware::from_fn_with_state(
             jwt_middleware_state,
             jwt_middleware,
