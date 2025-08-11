@@ -19,9 +19,21 @@ use axum::{Router, http, middleware};
 use dotenvy::dotenv;
 use std::env;
 use std::sync::Arc;
-use tower::ServiceBuilder;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
+
+
+fn create_cors_layer() -> CorsLayer {
+    CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
+        .allow_headers([
+            http::header::CONTENT_TYPE,
+            http::header::AUTHORIZATION,
+            http::header::ACCEPT,
+        ])
+}
+
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -50,15 +62,6 @@ async fn main() -> anyhow::Result<()> {
         user_repo: Arc::new(user_repo.clone()),
     });
 
-    let cors_layer = CorsLayer::new()
-        .allow_origin(Any) // Open access to selected route
-        .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
-        .allow_headers([
-            http::header::CONTENT_TYPE,
-            http::header::AUTHORIZATION,
-            http::header::ACCEPT,
-        ]);
-
     let private_router = Router::new()
         .nest("/category", category_routes(Arc::new(category_app_state)))
         .layer(middleware::from_fn_with_state(
@@ -71,7 +74,7 @@ async fn main() -> anyhow::Result<()> {
     let app = Router::new()
         .merge(private_router)
         .merge(public_router)
-        .layer(ServiceBuilder::new().layer(cors_layer))
+        .layer(create_cors_layer())
         .layer(TraceLayer::new_for_http());
 
     println!("Server starting on http://0.0.0.0:8888");
