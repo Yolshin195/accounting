@@ -1,6 +1,6 @@
+use crate::domain::category::Category;
 use async_trait::async_trait;
 use uuid::Uuid;
-use crate::domain::category::Category;
 
 #[async_trait]
 pub trait CategoryRepository: Send + Sync {

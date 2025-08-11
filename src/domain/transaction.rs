@@ -1,8 +1,8 @@
-use uuid::Uuid;
+use crate::domain::category::CategoryType;
 use chrono::DateTime;
 use chrono::Utc;
 use rust_decimal::Decimal;
-use crate::domain::category::CategoryType;
+use uuid::Uuid;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TransactionType {

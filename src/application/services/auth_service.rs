@@ -1,11 +1,11 @@
 use crate::domain::user::User;
-use crate::infrastructure::auth::{password};
+use crate::infrastructure::auth::password;
 
-use anyhow::{Result, bail};
-use uuid::Uuid;
 use crate::application::dtos::user_dto::{JwtResponse, LoginTelegramBotDto};
 use crate::application::traits::user_repo::UserRepository;
 use crate::infrastructure::auth::jwt::JwtService;
+use anyhow::{Result, bail};
+use uuid::Uuid;
 
 #[derive(Clone)]
 pub struct AuthService<R: UserRepository> {

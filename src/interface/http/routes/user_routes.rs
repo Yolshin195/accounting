@@ -1,10 +1,7 @@
-use axum::{
-    routing::post,
-    Router,
-};
-use crate::interface::http::handlers::user_handler;
-use std::sync::Arc;
 use crate::infrastructure::app_state::UserAppState;
+use crate::interface::http::handlers::user_handler;
+use axum::{Router, routing::post};
+use std::sync::Arc;
 
 pub fn user_routes(state: Arc<UserAppState>) -> Router {
     Router::new()

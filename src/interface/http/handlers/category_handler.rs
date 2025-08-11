@@ -1,8 +1,8 @@
-use axum::{extract::State, Extension, Json};
-use crate::application::dtos::category_dto::{CreateCategoryDto, CategoryDto};
-use std::sync::Arc;
+use crate::application::dtos::category_dto::{CategoryDto, CreateCategoryDto};
 use crate::domain::user::User;
 use crate::infrastructure::app_state::CategoryAppState;
+use axum::{Extension, Json, extract::State};
+use std::sync::Arc;
 
 pub async fn create_category(
     State(state): State<Arc<CategoryAppState>>,
@@ -10,7 +10,11 @@ pub async fn create_category(
     Json(payload): Json<CreateCategoryDto>,
 ) -> Json<CategoryDto> {
     println!("{:?}", user);
-    let created = state.category_service.create(payload, user.id).await.unwrap(); // добавь обработку ошибок
+    let created = state
+        .category_service
+        .create(payload, user.id)
+        .await
+        .unwrap(); // добавь обработку ошибок
     Json(created)
 }
 

@@ -1,7 +1,7 @@
+use crate::application::traits::category_repo::CategoryRepository;
+use crate::domain::category::{Category, CategoryType};
 use async_trait::async_trait;
 use sqlx::PgPool;
-use crate::domain::category::{Category, CategoryType};
-use crate::application::traits::category_repo::CategoryRepository;
 use uuid::Uuid;
 
 #[derive(Clone)]
@@ -27,8 +27,8 @@ impl CategoryRepository for PostgresCategoryRepo {
                 CategoryType::Expense => "EXPENSE",
             }
         )
-            .execute(&self.pool)
-            .await?;
+        .execute(&self.pool)
+        .await?;
 
         Ok(category)
     }
@@ -42,8 +42,8 @@ impl CategoryRepository for PostgresCategoryRepo {
             "#,
             user_id
         )
-            .fetch_all(&self.pool)
-            .await?;
+        .fetch_all(&self.pool)
+        .await?;
 
         Ok(rows
             .into_iter()

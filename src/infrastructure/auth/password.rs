@@ -1,11 +1,8 @@
+use anyhow::{Result, anyhow};
 use argon2::{
-    password_hash::{
-        rand_core::OsRng,
-        PasswordHash, PasswordHasher, PasswordVerifier, SaltString
-    },
-    Argon2
+    Argon2,
+    password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng},
 };
-use anyhow::{anyhow, Result};
 
 /// Хеширует пароль с уникальной солью и возвращает PHC string
 pub fn hash_password(password: &str) -> Result<String> {
@@ -16,20 +13,18 @@ pub fn hash_password(password: &str) -> Result<String> {
         .hash_password(password.as_bytes(), &salt)
         .map(|hash| hash.to_string())
         .map_err(|e| anyhow!("Failed to hash password: {:?}", e))
-
 }
 
 /// Проверяет пароль по PHC string, возвращает true если совпадает
 pub fn verify_password(hash: &str, password: &str) -> Result<bool> {
-    let parsed_hash = PasswordHash::new(hash)
-        .map_err(|e| anyhow!("Invalid password hash: {:?}", e))?;
+    let parsed_hash =
+        PasswordHash::new(hash).map_err(|e| anyhow!("Invalid password hash: {:?}", e))?;
 
     let argon2 = Argon2::default();
     let result = argon2.verify_password(password.as_bytes(), &parsed_hash);
 
     Ok(result.is_ok())
 }
-
 
 #[cfg(test)]
 mod tests {

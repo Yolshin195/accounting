@@ -1,4 +1,4 @@
-use sqlx::{PgPool, postgres::PgPoolOptions, migrate::Migrator};
+use sqlx::{PgPool, migrate::Migrator, postgres::PgPoolOptions};
 use std::env;
 
 static MIGRATOR: Migrator = sqlx::migrate!("./migrations");

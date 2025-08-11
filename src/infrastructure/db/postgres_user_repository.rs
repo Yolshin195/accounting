@@ -28,8 +28,8 @@ impl UserRepository for PostgresUserRepository {
             user.username,
             user.password_hash,
         )
-            .execute(&self.pool)
-            .await?;
+        .execute(&self.pool)
+        .await?;
         Ok(())
     }
 
@@ -42,8 +42,8 @@ impl UserRepository for PostgresUserRepository {
             "#,
             username
         )
-            .fetch_optional(&self.pool)
-            .await?;
+        .fetch_optional(&self.pool)
+        .await?;
 
         Ok(record.map(|row| User {
             id: row.id,
@@ -52,7 +52,7 @@ impl UserRepository for PostgresUserRepository {
             password_hash: row.password_hash,
         }))
     }
-    
+
     async fn find_by_id(&self, id: Uuid) -> Result<Option<User>, anyhow::Error> {
         let record = sqlx::query!(
             r#"
@@ -62,8 +62,8 @@ impl UserRepository for PostgresUserRepository {
             "#,
             id
         )
-            .fetch_optional(&self.pool)
-            .await?;
+        .fetch_optional(&self.pool)
+        .await?;
 
         Ok(record.map(|row| User {
             id: row.id,

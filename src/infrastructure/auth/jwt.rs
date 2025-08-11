@@ -1,11 +1,13 @@
 use chrono::{Duration, Utc};
-use jsonwebtoken::{encode, decode, DecodingKey, EncodingKey, Header, Validation, TokenData, errors::Error as JwtError, Algorithm};
 use jsonwebtoken::errors::ErrorKind;
+use jsonwebtoken::{
+    Algorithm, DecodingKey, EncodingKey, Header, TokenData, Validation, decode, encode,
+    errors::Error as JwtError,
+};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 const ALGORITHM: Algorithm = Algorithm::HS512;
-
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Claims {
@@ -45,7 +47,8 @@ impl JwtService {
 
     pub fn generate_tokens(&self, user_id: Uuid) -> Tokens {
         let access_token = self.generate_token(user_id, TokenType::Access, self.access_exp_minutes);
-        let refresh_token = self.generate_token(user_id, TokenType::Refresh, self.refresh_exp_days * 24 * 60);
+        let refresh_token =
+            self.generate_token(user_id, TokenType::Refresh, self.refresh_exp_days * 24 * 60);
 
         Tokens {
             access_token,
@@ -53,7 +56,12 @@ impl JwtService {
         }
     }
 
-    fn generate_token(&self, user_id: Uuid, token_type: TokenType, expires_in_minutes: i64) -> String {
+    fn generate_token(
+        &self,
+        user_id: Uuid,
+        token_type: TokenType,
+        expires_in_minutes: i64,
+    ) -> String {
         let now = Utc::now();
         let exp = now + Duration::minutes(expires_in_minutes);
 
@@ -68,13 +76,18 @@ impl JwtService {
             &Header::new(ALGORITHM),
             &claims,
             &EncodingKey::from_secret(self.secret.as_bytes()),
-        ).unwrap()
+        )
+        .unwrap()
     }
 
-    pub fn validate_token(&self, token: &str, expected_type: TokenType) -> Result<Claims, JwtError> {
+    pub fn validate_token(
+        &self,
+        token: &str,
+        expected_type: TokenType,
+    ) -> Result<Claims, JwtError> {
         let mut validation = Validation::new(ALGORITHM);
         validation.validate_exp = true;
-        
+
         let token_data: TokenData<Claims> = decode(
             token,
             &DecodingKey::from_secret(self.secret.as_bytes()),
@@ -112,7 +125,9 @@ mod tests {
         let user_id = Uuid::new_v4();
         let tokens = jwt.generate_tokens(user_id);
 
-        let claims = jwt.validate_token(&tokens.access_token, TokenType::Access).unwrap();
+        let claims = jwt
+            .validate_token(&tokens.access_token, TokenType::Access)
+            .unwrap();
         assert_eq!(claims.sub, user_id);
         assert_eq!(claims.token_type, TokenType::Access);
     }
@@ -123,7 +138,9 @@ mod tests {
         let user_id = Uuid::new_v4();
         let tokens = jwt.generate_tokens(user_id);
 
-        let claims = jwt.validate_token(&tokens.refresh_token, TokenType::Refresh).unwrap();
+        let claims = jwt
+            .validate_token(&tokens.refresh_token, TokenType::Refresh)
+            .unwrap();
         assert_eq!(claims.sub, user_id);
         assert_eq!(claims.token_type, TokenType::Refresh);
     }
@@ -157,7 +174,8 @@ mod tests {
             &Header::default(),
             &claims,
             &EncodingKey::from_secret(secret.as_bytes()),
-        ).unwrap();
+        )
+        .unwrap();
 
         let jwt = JwtService::new(secret.to_string(), 1, 1);
         let result = jwt.validate_token(&token, TokenType::Access);
@@ -182,7 +200,8 @@ mod tests {
             &Header::new(ALGORITHM),
             &claims,
             &EncodingKey::from_secret(secret.as_bytes()),
-        ).unwrap();
+        )
+        .unwrap();
 
         let jwt = JwtService::new(secret.to_string(), 1, 1);
         let decoded = jwt.decode_token(&token).unwrap();
