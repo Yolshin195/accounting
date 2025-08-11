@@ -14,5 +14,6 @@ pub struct CategoryDto {
     pub code: String,
     pub name: String,
     pub description: Option<String>,
+    #[serde(rename = "type")]
     pub category_type: String,
 }

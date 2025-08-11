@@ -3,6 +3,7 @@ use crate::domain::category::{Category, CategoryType};
 use async_trait::async_trait;
 use sqlx::PgPool;
 use uuid::Uuid;
+use crate::application::dtos::pagination_dto::Pagination;
 
 #[derive(Clone)]
 pub struct PostgresCategoryRepo {
@@ -33,14 +34,18 @@ impl CategoryRepository for PostgresCategoryRepo {
         Ok(category)
     }
 
-    async fn find_all(&self, user_id: Uuid) -> anyhow::Result<Vec<Category>> {
+    async fn find_all(&self, user_id: Uuid, pagination: Pagination) -> anyhow::Result<Vec<Category>> {
         let rows = sqlx::query!(
             r#"
             SELECT id, user_id, code, name, description, type
             FROM accounting_categories
             WHERE user_id = $1
+            ORDER BY code
+            LIMIT $2 OFFSET $3
             "#,
-            user_id
+            user_id,
+            pagination.size,
+            pagination.offset()
         )
         .fetch_all(&self.pool)
         .await?;

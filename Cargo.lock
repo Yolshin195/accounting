@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "accounting"
-version = "0.1.2"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "argon2",
@@ -19,7 +19,6 @@ dependencies = [
  "serde",
  "sqlx",
  "tokio",
- "tower",
  "tower-http",
  "uuid",
 ]
