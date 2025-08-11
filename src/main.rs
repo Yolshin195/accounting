@@ -4,7 +4,7 @@ mod infrastructure;
 mod interface;
 
 use std::sync::Arc;
-use axum::{routing::get, Router, middleware};
+use axum::{Router, middleware};
 use tower_http::trace::TraceLayer;
 
 use std::env;
@@ -39,17 +39,22 @@ async fn main() -> anyhow::Result<()> {
     let category_app_state = CategoryAppState { category_service: category_service.clone() };
     let jwt_middleware_state = Arc::new(JwtMiddlewareState { jwt_service: jwt_service.clone(), user_repo: Arc::new(user_repo.clone())});
     
-    let app = Router::new()
-        .nest("/users", user_routes(Arc::new(user_app_state)))
+    let private_router = Router::new()
         .nest("/category", category_routes(Arc::new(category_app_state)))
-        .route("/", get(|| async { "Hello, World!" }))
-        .layer(TraceLayer::new_for_http())
         .layer(middleware::from_fn_with_state(jwt_middleware_state, jwt_middleware));
+    
+    let public_router = Router::new()
+        .nest("/users", user_routes(Arc::new(user_app_state)));
+    
+    let app = Router::new()
+        .merge(private_router)
+        .merge(public_router)
+        .layer(TraceLayer::new_for_http());
 
-    println!("Server starting on http://0.0.0.0:3000");
+    println!("Server starting on http://0.0.0.0:8888");
 
     // run our app with hyper, listening globally on port 3000
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:8888").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 
     Ok(())
