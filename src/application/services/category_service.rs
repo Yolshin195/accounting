@@ -64,4 +64,8 @@ impl<R: CategoryRepository> CategoryService<R> {
         let response = PagedResponse::new(list_dto, &pagination, 100);
         Ok(response)
     }
+
+    pub async fn delete_by_code(&self, user_id: Uuid, code: String) -> anyhow::Result<()> {
+        self.repo.delete_by_code(user_id, code).await
+    }
 }

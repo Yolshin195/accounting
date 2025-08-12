@@ -66,4 +66,23 @@ impl CategoryRepository for PostgresCategoryRepo {
             })
             .collect())
     }
+    
+    async fn delete_by_code(&self, user_id: Uuid, code: String) -> anyhow::Result<()> {
+        let result = sqlx::query!(
+            r#"
+            DELETE FROM accounting_categories
+            WHERE user_id = $1 AND code = $2
+            "#,
+            user_id,
+            code
+        )
+        .execute(&self.pool)
+        .await?;
+
+        if result.rows_affected() == 0 {
+            return Err(anyhow::anyhow!("Category with code '{}' not found", code));
+        }
+        
+        Ok(())
+    }
 }

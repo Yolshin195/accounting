@@ -26,7 +26,13 @@ use tower_http::trace::TraceLayer;
 fn create_cors_layer() -> CorsLayer {
     CorsLayer::new()
         .allow_origin(Any)
-        .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
+        .allow_methods([
+            Method::GET,
+            Method::POST,
+            Method::PUT,
+            Method::DELETE,
+            Method::OPTIONS,
+        ])
         .allow_headers([
             http::header::CONTENT_TYPE,
             http::header::AUTHORIZATION,

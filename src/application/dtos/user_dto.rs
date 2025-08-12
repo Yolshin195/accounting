@@ -17,6 +17,7 @@ pub struct LoginRequest {
 /// Ответ с access/refresh токенами
 #[derive(Debug, Serialize)]
 pub struct JwtResponse {
+    #[serde(rename = "token")]
     pub access_token: String,
     pub refresh_token: String,
 }
