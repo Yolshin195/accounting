@@ -30,6 +30,7 @@ impl TransactionType {
 #[derive(Debug, Clone)]
 pub struct Transaction {
     pub id: Uuid,
+    pub user_id: Uuid,
     pub amount: Decimal,
     pub category_code: String,
     pub description: Option<String>,
