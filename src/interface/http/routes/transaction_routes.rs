@@ -1,4 +1,4 @@
-use crate::infrastructure::app_state::{TransactionAppState};
+use crate::infrastructure::app_state::TransactionAppState;
 use crate::interface::http::handlers::transaction_handler::transaction_list;
 use axum::{Router, routing::get};
 use std::sync::Arc;
