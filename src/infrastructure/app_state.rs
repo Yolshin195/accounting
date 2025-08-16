@@ -17,5 +17,5 @@ pub struct UserAppState {
 
 #[derive(Clone)]
 pub struct TransactionAppState {
-    pub transaction_service: TransactionService<PostgresTransactionRepo>
+    pub transaction_service: TransactionService<PostgresTransactionRepo, PostgresCategoryRepo>
 }

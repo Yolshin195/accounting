@@ -58,11 +58,7 @@ impl CategoryRepository for PostgresCategoryRepo {
                 code: row.code,
                 name: row.name,
                 description: row.description,
-                category_type: if row.r#type == "INCOME" {
-                    CategoryType::Income
-                } else {
-                    CategoryType::Expense
-                },
+                category_type: CategoryType::from_str(row.r#type.as_str()).unwrap()
             })
             .collect())
     }
@@ -84,5 +80,41 @@ impl CategoryRepository for PostgresCategoryRepo {
         }
         
         Ok(())
+    }
+
+    async fn count(&self, user_id: Uuid) -> anyhow::Result<i64> {
+        let result = sqlx::query!(
+            r#"
+            SELECT COUNT(*)
+            FROM accounting_categories
+            WHERE user_id = $1
+            "#,
+            user_id
+        )
+        .fetch_one(&self.pool)
+        .await?;
+        
+        Ok(result.count.unwrap())
+    }
+
+    async fn find_by_code(&self, user_id: Uuid, code: String) -> anyhow::Result<Option<Category>> {
+        let row = sqlx::query!(
+            r#"
+            SELECT id, user_id, code, name, description, type
+            FROM accounting_categories
+            WHERE user_id = $1 AND code = $2
+            "#,
+            user_id,
+            code
+        ).fetch_one(&self.pool).await?;
+
+        Ok(Some(Category {
+            id: row.id,
+            user_id: row.user_id,
+            code: row.code,
+            name: row.name,
+            description: row.description,
+            category_type: CategoryType::from_str(row.r#type.as_str()).unwrap()
+        }))
     }
 }

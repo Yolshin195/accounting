@@ -17,6 +17,7 @@ mod tests {
     use super::*;
     use crate::application::services::transaction_service::TransactionService;
     use crate::infrastructure::db::db::init_pg_pool;
+    use crate::infrastructure::db::postgres_category_repository::PostgresCategoryRepo;
     use crate::infrastructure::db::postgres_transaction_repository::PostgresTransactionRepo;
 
     #[tokio::test]
@@ -26,7 +27,10 @@ mod tests {
         let app_state = TransactionAppState {
             transaction_service: TransactionService::new(
                 PostgresTransactionRepo {
-                    pool: db_pool
+                    pool: db_pool.clone()
+                },
+                PostgresCategoryRepo {
+                    pool: db_pool.clone()
                 }
             ),
         };

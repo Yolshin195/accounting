@@ -1,4 +1,5 @@
 use crate::domain::category::CategoryType;
+use std::fmt;
 use chrono::DateTime;
 use chrono::Utc;
 use rust_decimal::Decimal;
@@ -9,6 +10,16 @@ pub enum TransactionType {
     Expense,
     Income,
 }
+
+impl fmt::Display for TransactionType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Expense => write!(f, "Expense"),
+            Self::Income => write!(f, "Income"),
+        }
+    }
+}
+
 
 impl TransactionType {
     pub fn from_category_type(cat_type: &CategoryType) -> Self {
@@ -28,12 +39,34 @@ impl TransactionType {
 }
 
 #[derive(Debug, Clone)]
-pub struct Transaction {
+pub struct CreateTransaction {
     pub id: Uuid,
     pub user_id: Uuid,
+    pub category_id: Uuid,
     pub amount: Decimal,
-    pub category_code: String,
     pub description: Option<String>,
     pub created_at: DateTime<Utc>,
     pub transaction_type: TransactionType,
+}
+
+#[derive(Debug, Clone)]
+pub struct Transaction {
+    pub id: Uuid,
+    pub user_id: Uuid,
+    pub category_code: String,
+    pub amount: Decimal,
+    pub description: Option<String>,
+    pub created_at: DateTime<Utc>,
+    pub transaction_type: TransactionType,
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_transaction_type_to_string() {
+        let t = TransactionType::Expense;
+        assert_eq!(t.to_string(), "Expense");
+    }
 }
