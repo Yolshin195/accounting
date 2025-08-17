@@ -139,6 +139,7 @@ authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiNGFhNTk2M
 <> 2025-08-17T152922.200.json
 
 ###
+
 GET http://localhost:8888/transactions/73241f97-1816-4aa7-ae36-4fd90ca3f01c
 Accept: application/json
 Content-Type: application/json
@@ -147,3 +148,11 @@ authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiNGFhNTk2M
 <> 2025-08-17T152813.200.json
 <> 2025-08-17T151854.200.json
 <> 2025-08-17T151850.200.json
+
+###
+
+GET http://localhost:8888/transactions/expenses/today
+Accept: application/json
+Content-Type: application/json
+authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiNGFhNTk2MC0zNWFiLTQ3MzAtOTAyMS0zZDYxMDRjNWE1ZjAiLCJleHAiOjE3NTQ4OTI0MjcsImp0aSI6IjYzY2Y5NWE0LTQyYzctNDgwYy05ODZkLTAwZTE0MTllYTI2NCIsInRva2VuX3R5cGUiOiJhY2Nlc3MifQ.XmkMlPuiXka2Nz5uq3JVs1_EW0tPp9_rHdv8cj_Ns7clWTS1yuj7JtSo9oEIsBbvNgGCEvSHvNmDBMJdd2F5MA
+

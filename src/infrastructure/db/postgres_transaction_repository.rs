@@ -1,7 +1,10 @@
 use async_trait::async_trait;
+use chrono::{Datelike, NaiveDate};
+use rust_decimal::Decimal;
 use sqlx::PgPool;
 use uuid::Uuid;
 use crate::application::dtos::pagination_dto::Pagination;
+use crate::application::dtos::transaction_dto::CategoryExpenseSummaryDto;
 use crate::application::traits::transaction_repo::TransactionRepository;
 use crate::domain::transaction::{CreateTransaction, Transaction, TransactionType, UpdateTransaction};
 
@@ -187,5 +190,35 @@ impl TransactionRepository for PostgresTransactionRepo {
         }
         
         Ok(())
+    }
+
+    async fn sum_today_expenses_grouped_by_category(&self, user_id: Uuid, today: NaiveDate) -> anyhow::Result<Vec<CategoryExpenseSummaryDto>> {
+        let rows = sqlx::query!(
+        r#"
+        SELECT
+            categories.code as category_code,
+            SUM(transaction.amount) as total_amount
+        FROM accounting_transactions transaction
+        JOIN accounting_categories as categories ON categories.id = transaction.category_id
+        WHERE
+                transaction.user_id = $1
+            AND transaction.type = 'EXPENSE'
+            AND EXTRACT(YEAR FROM transaction.created_at)::INTEGER = $2
+            AND EXTRACT(MONTH FROM transaction.created_at)::INTEGER = $3
+            AND EXTRACT(DAY FROM transaction.created_at)::INTEGER = $4
+        GROUP BY categories.code
+        "#,
+            user_id,
+            today.year(),
+            today.month() as i32,
+            today.day() as i32
+    ).fetch_all(&self.pool).await?;
+
+        let result = rows.into_iter().map(|row| CategoryExpenseSummaryDto {
+            category_code: row.category_code,
+            total_amount: row.total_amount.unwrap_or_else(|| Decimal::new(0, 0)),
+        }).collect();
+
+        Ok(result)
     }
 }

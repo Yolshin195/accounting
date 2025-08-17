@@ -1,8 +1,8 @@
-use chrono::{Datelike, Utc};
+use chrono::{Datelike, NaiveDate, Utc};
 use rust_decimal::Decimal;
 use uuid::Uuid;
 use crate::application::dtos::pagination_dto::{PagedResponse, Pagination};
-use crate::application::dtos::transaction_dto::{CreateTransactionDto, TransactionDto, UpdateTransactionDto};
+use crate::application::dtos::transaction_dto::{CategoryExpenseSummaryDto, CreateTransactionDto, TransactionDto, UpdateTransactionDto};
 use crate::application::traits::category_repo::CategoryRepository;
 use crate::application::traits::transaction_repo::TransactionRepository;
 use crate::domain::transaction::{CreateTransaction, TransactionType, UpdateTransaction};
@@ -34,7 +34,7 @@ impl<TR: TransactionRepository, CR: CategoryRepository> TransactionService<TR, C
         if category.is_none() {
             return Err(anyhow::anyhow!("Category not found"));
         }
-        
+
         let transaction_id = Uuid::new_v4();
         let new_transaction = CreateTransaction {
             id: transaction_id,
@@ -69,24 +69,24 @@ impl<TR: TransactionRepository, CR: CategoryRepository> TransactionService<TR, C
         let category = self.category_repo.find_by_code(
             user_id, transaction.category_code
         ).await?;
-        
+
         if category.is_none() {
             return Err(anyhow::anyhow!("Category not found"));
         }
-        
+
         let data_for_update = UpdateTransaction {
             category_id: category.unwrap().id,
             amount: transaction.amount,
             description: transaction.description,
             created_at: transaction.date.naive_utc()
         };
-        
+
         self.repo.update(user_id, id, data_for_update).await?;
-        
+
         let response = self.repo.find_by_id_and_user_id(id, user_id)
             .await?
             .ok_or_else(|| anyhow::anyhow!("Transaction not found"))?;
-        
+
         Ok(
             TransactionDto {
                 id: response.id,
@@ -115,7 +115,7 @@ impl<TR: TransactionRepository, CR: CategoryRepository> TransactionService<TR, C
         let response = PagedResponse::new(list_dto, &pagination, total_elements);
         Ok(response)
     }
-    
+
     pub async fn find_by_user_id_and_id(&self, user_id: Uuid, id: Uuid) -> anyhow::Result<TransactionDto> {
         let response = self.repo.find_by_id_and_user_id(id, user_id)
             .await?
@@ -154,6 +154,11 @@ impl<TR: TransactionRepository, CR: CategoryRepository> TransactionService<TR, C
     pub async fn delete(&self, user_id: Uuid, id: Uuid) -> anyhow::Result<()> {
         self.repo.delete(user_id, id).await
     }
+    
+    pub async fn sum_today_expenses_grouped_by_category(&self, user_id: Uuid) -> anyhow::Result<Vec<CategoryExpenseSummaryDto>> {
+        let today: NaiveDate = Utc::now().date_naive();
+        self.repo.sum_today_expenses_grouped_by_category(user_id, today).await
+    }
 }
 
 #[cfg(test)]
@@ -164,7 +169,7 @@ mod tests {
     use crate::application::traits::transaction_repo::mock::InMemoryTransactionRepo;
     use crate::domain::transaction::{TransactionType};
     use super::*;
-    
+
     fn get_mock_transaction() -> CreateTransaction {
         CreateTransaction {
             id: Uuid::new_v4(),

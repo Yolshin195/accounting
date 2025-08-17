@@ -4,7 +4,7 @@ use axum::extract::{Path, Query, State};
 use axum::http::{StatusCode};
 use uuid::Uuid;
 use crate::application::dtos::pagination_dto::{PagedResponse, Pagination};
-use crate::application::dtos::transaction_dto::{CreateTransactionDto, MonthlyTransactionQuery, TransactionDto, UpdateTransactionDto};
+use crate::application::dtos::transaction_dto::{CategoryExpenseSummaryDto, CreateTransactionDto, MonthlyTransactionQuery, TransactionDto, UpdateTransactionDto};
 use crate::domain::user::User;
 use crate::infrastructure::app_state::{TransactionAppState};
 
@@ -99,4 +99,12 @@ pub async fn find_transaction_by_id(
             }
         },
     }
+}
+
+pub async fn sum_today_expenses_grouped_by_category(
+    State(state): State<Arc<TransactionAppState>>,
+    Extension(user): Extension<User>,
+) -> Json<Vec<CategoryExpenseSummaryDto>> {
+    let rows = state.transaction_service.sum_today_expenses_grouped_by_category(user.id).await.unwrap();
+    Json(rows)
 }

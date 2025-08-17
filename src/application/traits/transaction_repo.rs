@@ -1,7 +1,9 @@
 use crate::domain::transaction::{CreateTransaction, Transaction, UpdateTransaction};
 use async_trait::async_trait;
+use chrono::NaiveDate;
 use uuid::Uuid;
 use crate::application::dtos::pagination_dto::Pagination;
+use crate::application::dtos::transaction_dto::CategoryExpenseSummaryDto;
 
 #[async_trait]
 pub trait TransactionRepository: Send + Sync {
@@ -12,6 +14,7 @@ pub trait TransactionRepository: Send + Sync {
     async fn find_by_id_and_user_id(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<Option<Transaction>>;
     async fn count(&self, user_id: Uuid) -> anyhow::Result<i64>;
     async fn delete(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<()>;
+    async fn sum_today_expenses_grouped_by_category(&self, user_id: Uuid, today: NaiveDate) -> anyhow::Result<Vec<CategoryExpenseSummaryDto>>;
 }
 
 #[cfg(test)]
@@ -110,6 +113,10 @@ pub mod mock {
         }
 
         async fn delete(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<()> {
+            todo!()
+        }
+
+        async fn sum_today_expenses_grouped_by_category(&self, user_id: Uuid, today: NaiveDate) -> anyhow::Result<Vec<CategoryExpenseSummaryDto>> {
             todo!()
         }
     }

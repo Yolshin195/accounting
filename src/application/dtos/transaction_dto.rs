@@ -45,3 +45,11 @@ pub struct MonthlyTransactionQuery {
     pub pagination: Pagination,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct CategoryExpenseSummaryDto {
+    #[serde(rename = "categoryCode")]
+    pub category_code: String,
+    #[serde(rename = "totalAmount", with = "rust_decimal::serde::float")]
+    pub total_amount: Decimal,
+}
+
