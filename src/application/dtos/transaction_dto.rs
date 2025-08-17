@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -16,9 +16,11 @@ pub struct TransactionDto {
 }
 
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct CreateTransactionDto {
     pub amount: Decimal,
+    #[serde(rename = "category")]
     pub category_code: String,
     pub description: Option<String>,
+    pub date: Option<NaiveDate>,
 }

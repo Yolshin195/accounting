@@ -5,7 +5,7 @@ mod interface;
 
 use crate::application::services::auth_service::AuthService;
 use crate::application::services::category_service::CategoryService;
-use crate::infrastructure::app_state::CategoryAppState;
+use crate::infrastructure::app_state::{CategoryAppState, TransactionAppState};
 use crate::infrastructure::app_state::UserAppState;
 use crate::infrastructure::auth::jwt::JwtService;
 use crate::infrastructure::db::db::init_pg_pool;
@@ -21,7 +21,9 @@ use std::env;
 use std::sync::Arc;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
-
+use crate::application::services::transaction_service::TransactionService;
+use crate::infrastructure::db::postgres_transaction_repository::PostgresTransactionRepo;
+use crate::interface::http::routes::transaction_routes::get_transaction_routes;
 
 fn create_cors_layer() -> CorsLayer {
     CorsLayer::new()
@@ -59,10 +61,19 @@ async fn main() -> anyhow::Result<()> {
     let category_repo = PostgresCategoryRepo {
         pool: db_pool.clone(),
     };
-    let category_service = CategoryService::new(category_repo);
+    let category_service = CategoryService::new(category_repo.clone());
     let category_app_state = CategoryAppState {
         category_service: category_service.clone(),
     };
+    
+    let transaction_repo = PostgresTransactionRepo { pool: db_pool.clone() };
+    let transaction_service = TransactionService::new(
+        transaction_repo.clone(), category_repo.clone()
+    );
+    let transaction_app_state = TransactionAppState {
+        transaction_service
+    };
+    
     let jwt_middleware_state = Arc::new(JwtMiddlewareState {
         jwt_service: jwt_service.clone(),
         user_repo: Arc::new(user_repo.clone()),
@@ -70,6 +81,7 @@ async fn main() -> anyhow::Result<()> {
 
     let private_router = Router::new()
         .nest("/categories", category_routes(Arc::new(category_app_state)))
+        .nest("/transactions", get_transaction_routes(Arc::new(transaction_app_state)))
         .layer(middleware::from_fn_with_state(
             jwt_middleware_state,
             jwt_middleware,

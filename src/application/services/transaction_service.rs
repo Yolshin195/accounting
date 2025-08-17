@@ -8,13 +8,13 @@ use crate::application::traits::transaction_repo::TransactionRepository;
 use crate::domain::transaction::{CreateTransaction, TransactionType};
 
 #[derive(Clone)]
-pub struct TransactionService<R: TransactionRepository, CR: CategoryRepository> {
-    pub repo: R,
+pub struct TransactionService<TR: TransactionRepository, CR: CategoryRepository> {
+    pub repo: TR,
     pub category_repo: CR,
 }
 
-impl<R: TransactionRepository, CR: CategoryRepository> TransactionService<R, CR> {
-    pub fn new(repo: R, category_repo: CR) -> Self {
+impl<TR: TransactionRepository, CR: CategoryRepository> TransactionService<TR, CR> {
+    pub fn new(repo: TR, category_repo: CR) -> Self {
         Self { repo, category_repo }
     }
     
@@ -41,7 +41,7 @@ impl<R: TransactionRepository, CR: CategoryRepository> TransactionService<R, CR>
             amount: transaction.amount,
             category_id: category.unwrap().id,
             description: transaction.description,
-            created_at: Utc::now(),
+            created_at: Utc::now().naive_utc(),
             transaction_type
         };
 
@@ -52,13 +52,13 @@ impl<R: TransactionRepository, CR: CategoryRepository> TransactionService<R, CR>
             amount: created.amount,
             category_code: created.category_code,
             description: created.description,
-            date: created.created_at,
+            date: created.created_at.and_utc(),
             transaction_type: created.transaction_type.to_string().to_uppercase()
         })
     }
 
     pub async fn get_all(&self, user_id: Uuid, pagination: Pagination) -> anyhow::Result<PagedResponse<TransactionDto>> {
-        let count = self.repo.count(user_id).await?;
+        let total_elements = self.repo.count(user_id).await?;
         let list = self.repo.find_all(user_id, &pagination).await?;
         let list_dto = list.into_iter()
             .map(|row| TransactionDto {
@@ -66,12 +66,16 @@ impl<R: TransactionRepository, CR: CategoryRepository> TransactionService<R, CR>
                 amount: row.amount,
                 category_code: row.category_code,
                 description: row.description,
-                date: row.created_at,
+                date: row.created_at.and_utc(),
                 transaction_type: row.transaction_type.to_string().to_uppercase()
             })
             .collect();
-        let response = PagedResponse::new(list_dto, &pagination, count);
+        let response = PagedResponse::new(list_dto, &pagination, total_elements);
         Ok(response)
+    }
+    
+    pub async fn delete(&self, user_id: Uuid, id: Uuid) -> anyhow::Result<()> {
+        self.repo.delete(user_id, id).await
     }
 }
 
@@ -84,28 +88,73 @@ mod tests {
     use crate::domain::transaction::{TransactionType};
     use super::*;
     
-    #[tokio::test]
-    async fn test_gata_all() {
-        // Given
-        let user_id = Uuid::new_v4();
-        let pagination = Pagination::default();
-        let transaction = CreateTransaction {
+    fn get_mock_transaction() -> CreateTransaction {
+        CreateTransaction {
             id: Uuid::new_v4(),
-            user_id,
+            user_id: Uuid::new_v4(),
             category_id: Uuid::new_v4(),
             amount: Decimal::new(100, 0),
             description: Some("FOOD category".to_string()),
-            created_at: Utc::now(),
+            created_at: Utc::now().naive_utc(),
             transaction_type: TransactionType::Expense
-        };
+        }
+    }
+    
+    fn get_service() -> TransactionService<InMemoryTransactionRepo, MockInMemoryCategoryRepository> {
+        let repo = InMemoryTransactionRepo::new();
+        let category_repo = MockInMemoryCategoryRepository::new();
+        TransactionService::new(repo, category_repo)
+    }
+    
+    #[tokio::test]
+    async fn test_gata_all() {
+        // Given
+        let pagination = Pagination::default();
+        let transaction = get_mock_transaction();
         let repo = InMemoryTransactionRepo::new();
         let category_repo = MockInMemoryCategoryRepository::new();
         repo.save(transaction.clone()).await.unwrap();
         let service = TransactionService::new(repo, category_repo);
-        let page_res = service.get_all(user_id, pagination).await.unwrap();
+        let page_res = service.get_all(transaction.user_id, pagination).await.unwrap();
         
         assert_eq!(page_res.page.total_elements, 1);
         assert_eq!(page_res.page.total_pages, 1);
         assert_eq!(page_res.content.len(), 1);
+    }
+    
+    #[tokio::test]
+    async fn test_create_expense() {
+        let user_id = Uuid::new_v4();
+        let service = get_service();
+        let create_transaction_dto = CreateTransactionDto {
+            amount: Decimal::new(100, 0),
+            category_code: "FOOD".to_string(),
+            description: Some("FOOD category".to_string()),
+            date: None,
+        };
+        let created_transaction = service.create_expense(user_id, create_transaction_dto.clone()).await.unwrap();
+        
+        assert_eq!(created_transaction.amount, create_transaction_dto.amount);
+        assert_eq!(created_transaction.category_code, create_transaction_dto.category_code);
+        assert_eq!(created_transaction.description.unwrap(), create_transaction_dto.description.unwrap());
+        assert_eq!(created_transaction.transaction_type.to_string(), "EXPENSE".to_string());    
+    }
+    
+    #[tokio::test]
+    async fn test_create_income() {
+        let user_id = Uuid::new_v4();
+        let service = get_service();
+        let create_transaction_dto = CreateTransactionDto {
+            amount: Decimal::new(100, 0),
+            category_code: "FOOD".to_string(),
+            description: Some("FOOD category".to_string()),
+            date: None,
+        };
+        let created_transaction = service.create_income(user_id, create_transaction_dto.clone()).await.unwrap();
+
+        assert_eq!(created_transaction.amount, create_transaction_dto.amount);
+        assert_eq!(created_transaction.category_code, create_transaction_dto.category_code);
+        assert_eq!(created_transaction.description.unwrap(), create_transaction_dto.description.unwrap());
+        assert_eq!(created_transaction.transaction_type, "INCOME".to_string());
     }
 }

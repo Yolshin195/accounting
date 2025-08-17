@@ -1,8 +1,8 @@
 use crate::domain::category::CategoryType;
 use std::fmt;
-use chrono::DateTime;
-use chrono::Utc;
+use chrono::{NaiveDateTime};
 use rust_decimal::Decimal;
+use sqlx::FromRow;
 use uuid::Uuid;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -10,6 +10,25 @@ pub enum TransactionType {
     Expense,
     Income,
 }
+
+impl std::str::FromStr for TransactionType {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "expense" => Ok(Self::Expense),
+            "income" => Ok(Self::Income),
+            _ => Err(format!("Invalid transaction type: {}", s)),
+        }
+    }
+}
+
+impl From<String> for TransactionType {
+    fn from(s: String) -> Self {
+        s.as_str().parse().unwrap_or(Self::Expense) // По умолчанию Expense если не удалось распарсить
+    }
+}
+
 
 impl fmt::Display for TransactionType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -45,18 +64,18 @@ pub struct CreateTransaction {
     pub category_id: Uuid,
     pub amount: Decimal,
     pub description: Option<String>,
-    pub created_at: DateTime<Utc>,
+    pub created_at: NaiveDateTime,
     pub transaction_type: TransactionType,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, FromRow)]
 pub struct Transaction {
     pub id: Uuid,
     pub user_id: Uuid,
     pub category_code: String,
     pub amount: Decimal,
     pub description: Option<String>,
-    pub created_at: DateTime<Utc>,
+    pub created_at: NaiveDateTime,
     pub transaction_type: TransactionType,
 }
 

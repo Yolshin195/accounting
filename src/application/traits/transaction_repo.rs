@@ -7,7 +7,9 @@ use crate::application::dtos::pagination_dto::Pagination;
 pub trait TransactionRepository: Send + Sync {
     async fn save(&self, transaction: CreateTransaction) -> anyhow::Result<Transaction>;
     async fn find_all(&self, user_id: Uuid, pagination: &Pagination) -> anyhow::Result<Vec<Transaction>>;
+    async fn find_by_id_and_user_id(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<Transaction>;
     async fn count(&self, user_id: Uuid) -> anyhow::Result<i64>;
+    async fn delete(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<()>;
 }
 
 #[cfg(test)]
@@ -82,6 +84,10 @@ pub mod mock {
             )
         }
 
+        async fn find_by_id_and_user_id(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<Transaction> {
+            todo!()
+        }
+
         async fn count(&self, user_id: Uuid) -> anyhow::Result<i64> {
             let count = {
                 let rows = self.rows.lock()
@@ -91,6 +97,10 @@ pub mod mock {
             };
             
             Ok(count)       
+        }
+
+        async fn delete(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<()> {
+            todo!()
         }
     }
 
@@ -105,7 +115,7 @@ pub mod mock {
             amount: Decimal::new(100, 0),
             category_id: Uuid::new_v4(),
             description: Some("FOOD category".to_string()),
-            created_at: Utc::now(),
+            created_at: Utc::now().naive_utc(),
             transaction_type: TransactionType::Expense
         };
 

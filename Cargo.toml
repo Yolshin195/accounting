@@ -1,10 +1,10 @@
 [package]
 name = "accounting"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2024"
 
 [dependencies]
-sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio-rustls", "migrate", "chrono", "uuid"] }
+sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio-rustls", "migrate", "chrono", "uuid", "rust_decimal"] }
 tokio = { version = "1", features = ["full"] }
 async-trait = "0.1.88"
 chrono = { version = "0.4.41", features = ["serde"] }
