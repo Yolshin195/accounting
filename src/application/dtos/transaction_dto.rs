@@ -6,6 +6,7 @@ use uuid::Uuid;
 #[derive(Serialize, Deserialize)]
 pub struct TransactionDto {
     pub id: Uuid,
+    #[serde(with = "rust_decimal::serde::float")]
     pub amount: Decimal,
     #[serde(rename = "category")]
     pub category_code: String,

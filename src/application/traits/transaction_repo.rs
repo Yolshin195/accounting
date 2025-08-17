@@ -7,6 +7,7 @@ use crate::application::dtos::pagination_dto::Pagination;
 pub trait TransactionRepository: Send + Sync {
     async fn save(&self, transaction: CreateTransaction) -> anyhow::Result<Transaction>;
     async fn find_all(&self, user_id: Uuid, pagination: &Pagination) -> anyhow::Result<Vec<Transaction>>;
+    async fn find_all_by_month(&self, user_id: Uuid, year: u32, month: u32, pagination: &Pagination) -> anyhow::Result<Vec<Transaction>>;
     async fn find_by_id_and_user_id(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<Transaction>;
     async fn count(&self, user_id: Uuid) -> anyhow::Result<i64>;
     async fn delete(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<()>;
@@ -82,6 +83,10 @@ pub mod mock {
                     .take(pagination.size as usize)
                     .collect()
             )
+        }
+
+        async fn find_all_by_month(&self, user_id: Uuid, year: u32, month: u32, pagination: &Pagination) -> anyhow::Result<Vec<Transaction>> {
+            todo!()
         }
 
         async fn find_by_id_and_user_id(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<Transaction> {

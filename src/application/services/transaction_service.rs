@@ -1,4 +1,4 @@
-use chrono::Utc;
+use chrono::{Month, Utc};
 use rust_decimal::Decimal;
 use uuid::Uuid;
 use crate::application::dtos::pagination_dto::{PagedResponse, Pagination};
@@ -41,7 +41,10 @@ impl<TR: TransactionRepository, CR: CategoryRepository> TransactionService<TR, C
             amount: transaction.amount,
             category_id: category.unwrap().id,
             description: transaction.description,
-            created_at: Utc::now().naive_utc(),
+            created_at: match transaction.date{
+                Some(date) => date.and_hms_micro_opt(0, 0, 0, 0).unwrap(),
+                None => Utc::now().naive_utc()
+            },
             transaction_type
         };
 
@@ -60,6 +63,23 @@ impl<TR: TransactionRepository, CR: CategoryRepository> TransactionService<TR, C
     pub async fn get_all(&self, user_id: Uuid, pagination: Pagination) -> anyhow::Result<PagedResponse<TransactionDto>> {
         let total_elements = self.repo.count(user_id).await?;
         let list = self.repo.find_all(user_id, &pagination).await?;
+        let list_dto = list.into_iter()
+            .map(|row| TransactionDto {
+                id: row.id,
+                amount: row.amount,
+                category_code: row.category_code,
+                description: row.description,
+                date: row.created_at.and_utc(),
+                transaction_type: row.transaction_type.to_string().to_uppercase()
+            })
+            .collect();
+        let response = PagedResponse::new(list_dto, &pagination, total_elements);
+        Ok(response)
+    }
+    
+    pub async fn find_all_by_month(&self, user_id: Uuid, year: u32, month: Month, pagination: Pagination) -> anyhow::Result<PagedResponse<TransactionDto>> {
+        let total_elements = 1000;
+        let list = self.repo.find_all_by_month(user_id, year, month.number_from_month(), &pagination).await?;
         let list_dto = list.into_iter()
             .map(|row| TransactionDto {
                 id: row.id,

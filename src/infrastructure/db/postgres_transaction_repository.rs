@@ -81,7 +81,7 @@ impl TransactionRepository for PostgresTransactionRepo {
             FROM accounting_transactions transaction
             JOIN accounting_categories as categories ON categories.id = transaction.category_id
             WHERE transaction.user_id = $1
-            ORDER BY transaction.category_id
+            ORDER BY transaction.created_at, transaction.category_id
             LIMIT $2 OFFSET $3
             "#,
             user_id,
@@ -126,5 +126,38 @@ impl TransactionRepository for PostgresTransactionRepo {
         }
 
         Ok(())
+    }
+
+    async fn find_all_by_month(&self, user_id: Uuid, year: u32, month: u32, pagination: &Pagination) -> anyhow::Result<Vec<Transaction>> {
+        let rows = sqlx::query_as!(
+            Transaction,
+            r#"
+            SELECT
+                transaction.id,
+                transaction.user_id,
+                categories.code as category_code,
+                transaction.amount,
+                transaction.description,
+                transaction.created_at,
+                transaction.type as transaction_type
+            FROM accounting_transactions transaction
+            JOIN accounting_categories as categories ON categories.id = transaction.category_id
+            WHERE
+                transaction.user_id = $1
+                AND EXTRACT(YEAR FROM transaction.created_at)::INTEGER = $2
+                AND EXTRACT(MONTH FROM transaction.created_at)::INTEGER = $3
+            ORDER BY transaction.created_at, transaction.category_id
+            LIMIT $4 OFFSET $5
+            "#,
+            user_id,
+            year as i32,
+            month as i32,
+            pagination.size,
+            pagination.offset()
+        )
+            .fetch_all(&self.pool)
+            .await?;
+
+        Ok(rows)
     }
 }
