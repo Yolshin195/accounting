@@ -12,6 +12,13 @@ impl Pagination {
     pub fn offset(&self) -> i64 {
         self.page * self.size
     }
+    
+    pub fn default() -> Self {
+        Self {
+            page: default_page(),
+            size: default_per_page(),
+        }
+    }
 }
 
 fn default_page() -> i64 {

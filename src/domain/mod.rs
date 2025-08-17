@@ -1,3 +1,3 @@
 pub mod category;
-mod transaction;
+pub mod transaction;
 pub mod user;

@@ -1,21 +1,22 @@
 [package]
 name = "accounting"
-version = "0.1.5"
+version = "0.2.6"
 edition = "2024"
 
 [dependencies]
-sqlx = { version = "0.7", features = ["postgres", "runtime-tokio-rustls", "migrate", "chrono", "uuid"] }
+sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio-rustls", "migrate", "chrono", "uuid", "rust_decimal"] }
 tokio = { version = "1", features = ["full"] }
 async-trait = "0.1.88"
-chrono = "0.4.41"
+chrono = { version = "0.4.41", features = ["serde"] }
 jsonwebtoken = "9.3.1"
-rust_decimal = "1.37.2"
+rust_decimal = { version = "1.37.2", features = ["serde-with-float"] }
 serde = { version = "1.0.219", features = ["derive"] }
 uuid = { version = "1.17.0", features = ["serde", "v4"] }
 anyhow = "1.0.98"
 argon2 = { version = "0.5.3", features = ["rand", "simple"] }
-rand_core = { version = "0.6.4", features = ["std"] }
+rand_core = { version = "0.9.3", features = ["std"] }
 env_logger = "0.11.8"
 axum = "0.8.4"
 dotenvy = "0.15"
 tower-http = { version = "0.6.6", features = ["trace", "cors"] }
+tower = "0.5.2"
