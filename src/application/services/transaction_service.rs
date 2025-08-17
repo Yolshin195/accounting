@@ -1,4 +1,4 @@
-use chrono::{Month, Utc};
+use chrono::{Datelike, Utc};
 use rust_decimal::Decimal;
 use uuid::Uuid;
 use crate::application::dtos::pagination_dto::{PagedResponse, Pagination};
@@ -77,9 +77,11 @@ impl<TR: TransactionRepository, CR: CategoryRepository> TransactionService<TR, C
         Ok(response)
     }
     
-    pub async fn find_all_by_month(&self, user_id: Uuid, year: u32, month: Month, pagination: Pagination) -> anyhow::Result<PagedResponse<TransactionDto>> {
+    pub async fn find_all_by_month(&self, user_id: Uuid, year: Option<u32>, month: Option<u32>, pagination: Pagination) -> anyhow::Result<PagedResponse<TransactionDto>> {
         let total_elements = 1000;
-        let list = self.repo.find_all_by_month(user_id, year, month.number_from_month(), &pagination).await?;
+        let year = year.unwrap_or_else(|| Utc::now().year() as u32);
+        let month = month.unwrap_or_else(|| Utc::now().month());
+        let list = self.repo.find_all_by_month(user_id, year, month, &pagination).await?;
         let list_dto = list.into_iter()
             .map(|row| TransactionDto {
                 id: row.id,

@@ -1,5 +1,5 @@
 use crate::infrastructure::app_state::TransactionAppState;
-use crate::interface::http::handlers::transaction_handler::{create_expense_transaction, create_income_transaction, delete_transaction, transaction_list};
+use crate::interface::http::handlers::transaction_handler::{create_expense_transaction, create_income_transaction, delete_transaction, find_all_transaction_by_month, transaction_list};
 use axum::{Router, routing::get};
 use std::sync::Arc;
 use axum::routing::{delete, post};
@@ -7,6 +7,7 @@ use axum::routing::{delete, post};
 pub fn get_transaction_routes(state: Arc<TransactionAppState>) -> Router {
     Router::new()
         .route("/", get(transaction_list))
+        .route("/month", get(find_all_transaction_by_month))
         .route("/income", post(create_income_transaction))
         .route("/expense", post(create_expense_transaction))
         .route("/{id}", delete(delete_transaction))

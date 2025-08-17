@@ -4,7 +4,7 @@ use axum::extract::{Path, Query, State};
 use axum::http::{StatusCode};
 use uuid::Uuid;
 use crate::application::dtos::pagination_dto::{PagedResponse, Pagination};
-use crate::application::dtos::transaction_dto::{CreateTransactionDto, TransactionDto};
+use crate::application::dtos::transaction_dto::{CreateTransactionDto, MonthlyTransactionQuery, TransactionDto};
 use crate::domain::user::User;
 use crate::infrastructure::app_state::{TransactionAppState};
 
@@ -50,4 +50,18 @@ pub async fn delete_transaction(
             }
         },
     }
+}
+
+pub async fn find_all_transaction_by_month(
+    State(state): State<Arc<TransactionAppState>>,
+    Query(monthly_transaction_query): Query<MonthlyTransactionQuery>,
+    Extension(user): Extension<User>,
+) -> Json<PagedResponse<TransactionDto>> {
+    let page = state.transaction_service.find_all_by_month(
+        user.id,
+        monthly_transaction_query.year,
+        monthly_transaction_query.month,
+        monthly_transaction_query.pagination
+    ).await.unwrap();
+    Json(page)
 }
