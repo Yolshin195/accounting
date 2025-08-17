@@ -3,7 +3,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 use crate::application::dtos::pagination_dto::Pagination;
 use crate::application::traits::transaction_repo::TransactionRepository;
-use crate::domain::transaction::{CreateTransaction, Transaction, TransactionType};
+use crate::domain::transaction::{CreateTransaction, Transaction, TransactionType, UpdateTransaction};
 
 #[derive(Clone)]
 pub struct PostgresTransactionRepo {
@@ -12,7 +12,7 @@ pub struct PostgresTransactionRepo {
 
 #[async_trait]
 impl TransactionRepository for PostgresTransactionRepo {
-    async fn save(&self, transaction: CreateTransaction) -> anyhow::Result<Transaction> {
+    async fn save(&self, transaction: CreateTransaction) -> anyhow::Result<()> {
         sqlx::query!(
             r#"
             INSERT INTO accounting_transactions (
@@ -40,10 +40,10 @@ impl TransactionRepository for PostgresTransactionRepo {
             .execute(&self.pool)
             .await?;
 
-        self.find_by_id_and_user_id(transaction.id, transaction.user_id).await
+        Ok(())
     }
     
-    async fn find_by_id_and_user_id(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<Transaction> {
+    async fn find_by_id_and_user_id(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<Option<Transaction>> {
         let row = sqlx::query_as!(
             Transaction,
             r#"
@@ -61,7 +61,7 @@ impl TransactionRepository for PostgresTransactionRepo {
             "#,
             id,
             user_id
-        ).fetch_one(&self.pool).await?;
+        ).fetch_optional(&self.pool).await?;
         
         Ok(row)
     }
@@ -159,5 +159,33 @@ impl TransactionRepository for PostgresTransactionRepo {
             .await?;
 
         Ok(rows)
+    }
+
+    async fn update(&self, user_id: Uuid, transaction_id: Uuid, transaction: UpdateTransaction) -> anyhow::Result<()> {
+        let result = sqlx::query!(
+            r#"
+            UPDATE accounting_transactions
+            SET
+                category_id = $1,
+                amount = $2,
+                description = $3,
+                created_at = $4
+            WHERE
+                    user_id = $5
+                and id = $6
+            "#,
+            transaction.category_id,
+            transaction.amount,
+            transaction.description,
+            transaction.created_at,
+            user_id,
+            transaction_id
+        ).execute(&self.pool).await?;
+        
+        if result.rows_affected() == 0 {
+            return Err(anyhow::anyhow!("Transaction with id '{}' not found", transaction_id));
+        }
+        
+        Ok(())
     }
 }

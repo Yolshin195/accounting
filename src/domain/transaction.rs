@@ -68,6 +68,14 @@ pub struct CreateTransaction {
     pub transaction_type: TransactionType,
 }
 
+#[derive(Debug, Clone)]
+pub struct UpdateTransaction {
+    pub category_id: Uuid,
+    pub amount: Decimal,
+    pub description: Option<String>,
+    pub created_at: NaiveDateTime
+}
+
 #[derive(Debug, Clone, FromRow)]
 pub struct Transaction {
     pub id: Uuid,

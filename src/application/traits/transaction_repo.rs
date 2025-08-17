@@ -1,14 +1,15 @@
-use crate::domain::transaction::{CreateTransaction, Transaction};
+use crate::domain::transaction::{CreateTransaction, Transaction, UpdateTransaction};
 use async_trait::async_trait;
 use uuid::Uuid;
 use crate::application::dtos::pagination_dto::Pagination;
 
 #[async_trait]
 pub trait TransactionRepository: Send + Sync {
-    async fn save(&self, transaction: CreateTransaction) -> anyhow::Result<Transaction>;
+    async fn save(&self, transaction: CreateTransaction) -> anyhow::Result<()>;
+    async fn update(&self,user_id: Uuid, transaction_id: Uuid, transaction: UpdateTransaction) -> anyhow::Result<()>;
     async fn find_all(&self, user_id: Uuid, pagination: &Pagination) -> anyhow::Result<Vec<Transaction>>;
     async fn find_all_by_month(&self, user_id: Uuid, year: u32, month: u32, pagination: &Pagination) -> anyhow::Result<Vec<Transaction>>;
-    async fn find_by_id_and_user_id(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<Transaction>;
+    async fn find_by_id_and_user_id(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<Option<Transaction>>;
     async fn count(&self, user_id: Uuid) -> anyhow::Result<i64>;
     async fn delete(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<()>;
 }
@@ -37,7 +38,7 @@ pub mod mock {
 
     #[async_trait]
     impl TransactionRepository for InMemoryTransactionRepo {
-        async fn save(&self, transaction: CreateTransaction) -> anyhow::Result<Transaction> {
+        async fn save(&self, transaction: CreateTransaction) -> anyhow::Result<()> {
             let transaction_id = transaction.id; // Предполагаем, что у Transaction есть поле id
             let user_id = transaction.user_id;   // Предполагаем, что у Transaction есть поле user_id
             let new_transaction = Transaction {
@@ -62,7 +63,11 @@ pub mod mock {
                 user_transactions.insert(transaction_id, new_transaction.clone());
             } // Mutex автоматически освобождается здесь
 
-            Ok(new_transaction)
+            Ok(())
+        }
+
+        async fn update(&self, user_id: Uuid, transaction_id: Uuid, transaction: UpdateTransaction) -> anyhow::Result<()> {
+            todo!()
         }
 
         async fn find_all(&self, user_id: Uuid, pagination: &Pagination) -> anyhow::Result<Vec<Transaction>> {
@@ -89,7 +94,7 @@ pub mod mock {
             todo!()
         }
 
-        async fn find_by_id_and_user_id(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<Transaction> {
+        async fn find_by_id_and_user_id(&self, id: Uuid, user_id: Uuid) -> anyhow::Result<Option<Transaction>> {
             todo!()
         }
 

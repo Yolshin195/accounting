@@ -1,0 +1,149 @@
+POST http://localhost:8888/users/register
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "alex",
+  "password": "alex"
+}
+
+###
+
+POST http://localhost:8888/users/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "alex",
+  "password": "alex"
+}
+
+###
+
+POST http://localhost:8888/categories
+Accept: application/json
+Content-Type: application/json
+authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiNGFhNTk2MC0zNWFiLTQ3MzAtOTAyMS0zZDYxMDRjNWE1ZjAiLCJleHAiOjE3NTQ4OTI0MjcsImp0aSI6IjYzY2Y5NWE0LTQyYzctNDgwYy05ODZkLTAwZTE0MTllYTI2NCIsInRva2VuX3R5cGUiOiJhY2Nlc3MifQ.XmkMlPuiXka2Nz5uq3JVs1_EW0tPp9_rHdv8cj_Ns7clWTS1yuj7JtSo9oEIsBbvNgGCEvSHvNmDBMJdd2F5MA
+
+{
+  "code": "FOOD1",
+  "name": "Еда1",
+  "type": "INCOME"
+}
+
+<> 2025-08-17T113233.200.json
+<> 2025-08-13T010405.200.json
+<> 2025-08-13T010355.200.json
+<> 2025-08-13T010206.200.json
+<> 2025-08-13T003636.200.json
+<> 2025-08-13T003630.422.txt
+
+###
+
+DELETE http://localhost:8888/categories/FOOD1
+Accept: application/json
+Content-Type: application/json
+authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiNGFhNTk2MC0zNWFiLTQ3MzAtOTAyMS0zZDYxMDRjNWE1ZjAiLCJleHAiOjE3NTQ4OTI0MjcsImp0aSI6IjYzY2Y5NWE0LTQyYzctNDgwYy05ODZkLTAwZTE0MTllYTI2NCIsInRva2VuX3R5cGUiOiJhY2Nlc3MifQ.XmkMlPuiXka2Nz5uq3JVs1_EW0tPp9_rHdv8cj_Ns7clWTS1yuj7JtSo9oEIsBbvNgGCEvSHvNmDBMJdd2F5MA
+
+###
+
+GET http://localhost:8888/categories?size=10&page=0
+Accept: application/json
+Content-Type: application/json
+authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiNGFhNTk2MC0zNWFiLTQ3MzAtOTAyMS0zZDYxMDRjNWE1ZjAiLCJleHAiOjE3NTQ4OTI0MjcsImp0aSI6IjYzY2Y5NWE0LTQyYzctNDgwYy05ODZkLTAwZTE0MTllYTI2NCIsInRva2VuX3R5cGUiOiJhY2Nlc3MifQ.XmkMlPuiXka2Nz5uq3JVs1_EW0tPp9_rHdv8cj_Ns7clWTS1yuj7JtSo9oEIsBbvNgGCEvSHvNmDBMJdd2F5MA
+
+###
+
+GET http://localhost:8888/transactions?size=10&page=0
+Accept: application/json
+Content-Type: application/json
+authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiNGFhNTk2MC0zNWFiLTQ3MzAtOTAyMS0zZDYxMDRjNWE1ZjAiLCJleHAiOjE3NTQ4OTI0MjcsImp0aSI6IjYzY2Y5NWE0LTQyYzctNDgwYy05ODZkLTAwZTE0MTllYTI2NCIsInRva2VuX3R5cGUiOiJhY2Nlc3MifQ.XmkMlPuiXka2Nz5uq3JVs1_EW0tPp9_rHdv8cj_Ns7clWTS1yuj7JtSo9oEIsBbvNgGCEvSHvNmDBMJdd2F5MA
+
+<> 2025-08-17T151637.200.json
+<> 2025-08-17T121128.200.json
+<> 2025-08-17T121124.200.json
+<> 2025-08-17T121100.200.json
+<> 2025-08-17T120931.200.json
+<> 2025-08-17T113057.200.json
+
+
+###
+
+POST http://localhost:8888/transactions/expense
+Accept: application/json
+Content-Type: application/json
+authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiNGFhNTk2MC0zNWFiLTQ3MzAtOTAyMS0zZDYxMDRjNWE1ZjAiLCJleHAiOjE3NTQ4OTI0MjcsImp0aSI6IjYzY2Y5NWE0LTQyYzctNDgwYy05ODZkLTAwZTE0MTllYTI2NCIsInRva2VuX3R5cGUiOiJhY2Nlc3MifQ.XmkMlPuiXka2Nz5uq3JVs1_EW0tPp9_rHdv8cj_Ns7clWTS1yuj7JtSo9oEIsBbvNgGCEvSHvNmDBMJdd2F5MA
+
+{
+  "amount": 100,
+  "category": "FOOD1",
+  "description": "Test create transaction"
+}
+
+<> 2025-08-17T121611.200.json
+<> 2025-08-17T113319.422.txt
+<> 2025-08-17T113311.400.txt
+<> 2025-08-17T113300.422.txt
+
+###
+
+POST http://localhost:8888/transactions/income
+Accept: application/json
+Content-Type: application/json
+authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiNGFhNTk2MC0zNWFiLTQ3MzAtOTAyMS0zZDYxMDRjNWE1ZjAiLCJleHAiOjE3NTQ4OTI0MjcsImp0aSI6IjYzY2Y5NWE0LTQyYzctNDgwYy05ODZkLTAwZTE0MTllYTI2NCIsInRva2VuX3R5cGUiOiJhY2Nlc3MifQ.XmkMlPuiXka2Nz5uq3JVs1_EW0tPp9_rHdv8cj_Ns7clWTS1yuj7JtSo9oEIsBbvNgGCEvSHvNmDBMJdd2F5MA
+
+{
+  "amount": 100,
+  "category": "FOOD1",
+  "description": "Test create transaction",
+  "date":"2025-07-01"
+}
+
+<> 2025-08-17T131633.200.json
+<> 2025-08-17T122118.200.json
+<> 2025-08-17T122114.200.json
+<> 2025-08-17T122017.422.txt
+<> 2025-08-17T121636.200.json
+
+###
+
+GET http://localhost:8888/transactions/month
+Accept: application/json
+Content-Type: application/json
+authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiNGFhNTk2MC0zNWFiLTQ3MzAtOTAyMS0zZDYxMDRjNWE1ZjAiLCJleHAiOjE3NTQ4OTI0MjcsImp0aSI6IjYzY2Y5NWE0LTQyYzctNDgwYy05ODZkLTAwZTE0MTllYTI2NCIsInRva2VuX3R5cGUiOiJhY2Nlc3MifQ.XmkMlPuiXka2Nz5uq3JVs1_EW0tPp9_rHdv8cj_Ns7clWTS1yuj7JtSo9oEIsBbvNgGCEvSHvNmDBMJdd2F5MA
+
+<> 2025-08-17T133643.200.json
+<> 2025-08-17T133636.200.json
+<> 2025-08-17T133605.200.json
+<> 2025-08-17T133251.400.txt
+<> 2025-08-17T133205.400.txt
+<> 2025-08-17T133127.400.txt
+<> 2025-08-17T133116.400.txt
+
+###
+
+PUT http://localhost:8888/transactions/73241f97-1816-4aa7-ae36-4fd90ca3f01c
+Accept: application/json
+Content-Type: application/json
+authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiNGFhNTk2MC0zNWFiLTQ3MzAtOTAyMS0zZDYxMDRjNWE1ZjAiLCJleHAiOjE3NTQ4OTI0MjcsImp0aSI6IjYzY2Y5NWE0LTQyYzctNDgwYy05ODZkLTAwZTE0MTllYTI2NCIsInRva2VuX3R5cGUiOiJhY2Nlc3MifQ.XmkMlPuiXka2Nz5uq3JVs1_EW0tPp9_rHdv8cj_Ns7clWTS1yuj7JtSo9oEIsBbvNgGCEvSHvNmDBMJdd2F5MA
+
+{
+  "amount": 1535.5,
+  "category": "DEBT_REPAYMENT",
+  "description": "Друг вернул долг, я за него заплатил в баре тест",
+  "date": "2025-08-17T05:50:29.875848Z"
+}
+
+<> 2025-08-17T152944.200.json
+<> 2025-08-17T152937.200.json
+<> 2025-08-17T152922.200.json
+
+###
+GET http://localhost:8888/transactions/73241f97-1816-4aa7-ae36-4fd90ca3f01c
+Accept: application/json
+Content-Type: application/json
+authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiNGFhNTk2MC0zNWFiLTQ3MzAtOTAyMS0zZDYxMDRjNWE1ZjAiLCJleHAiOjE3NTQ4OTI0MjcsImp0aSI6IjYzY2Y5NWE0LTQyYzctNDgwYy05ODZkLTAwZTE0MTllYTI2NCIsInRva2VuX3R5cGUiOiJhY2Nlc3MifQ.XmkMlPuiXka2Nz5uq3JVs1_EW0tPp9_rHdv8cj_Ns7clWTS1yuj7JtSo9oEIsBbvNgGCEvSHvNmDBMJdd2F5MA
+
+<> 2025-08-17T152813.200.json
+<> 2025-08-17T151854.200.json
+<> 2025-08-17T151850.200.json

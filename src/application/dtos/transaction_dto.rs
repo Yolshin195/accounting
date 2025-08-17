@@ -17,6 +17,16 @@ pub struct TransactionDto {
     pub transaction_type: String, // "INCOME" or "EXPENSE"
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct UpdateTransactionDto {
+    #[serde(with = "rust_decimal::serde::float")]
+    pub amount: Decimal,
+    #[serde(rename = "category")]
+    pub category_code: String,
+    pub description: Option<String>,
+    pub date: DateTime<Utc>
+}
+
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct CreateTransactionDto {
