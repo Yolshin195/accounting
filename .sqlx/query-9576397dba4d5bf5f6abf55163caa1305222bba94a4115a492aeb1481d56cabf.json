@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO accounting_transactions (\n                id,\n                user_id,\n                category_id,\n                amount,\n                description,\n                created_at,\n                type\n            )\n            VALUES ($1, $2, $3, $4, $5, $6, $7)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Numeric",
+        "Text",
+        "Timestamp",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9576397dba4d5bf5f6abf55163caa1305222bba94a4115a492aeb1481d56cabf"
+}

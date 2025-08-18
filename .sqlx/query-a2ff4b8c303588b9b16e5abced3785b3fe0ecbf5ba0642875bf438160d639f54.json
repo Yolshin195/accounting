@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE accounting_transactions\n            SET\n                category_id = $1,\n                amount = $2,\n                description = $3,\n                created_at = $4\n            WHERE\n                    user_id = $5\n                and id = $6\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Numeric",
+        "Text",
+        "Timestamp",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a2ff4b8c303588b9b16e5abced3785b3fe0ecbf5ba0642875bf438160d639f54"
+}

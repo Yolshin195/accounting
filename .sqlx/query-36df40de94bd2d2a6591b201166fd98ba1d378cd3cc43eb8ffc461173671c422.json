@@ -1,0 +1,31 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            categories.code as category_code,\n            SUM(transaction.amount) as total_amount\n        FROM accounting_transactions transaction\n        JOIN accounting_categories as categories ON categories.id = transaction.category_id\n        WHERE\n                transaction.user_id = $1\n            AND transaction.type = 'EXPENSE'\n            AND EXTRACT(YEAR FROM transaction.created_at)::INTEGER = $2\n            AND EXTRACT(MONTH FROM transaction.created_at)::INTEGER = $3\n            AND EXTRACT(DAY FROM transaction.created_at)::INTEGER = $4\n        GROUP BY categories.code\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "category_code",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "total_amount",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int4",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "36df40de94bd2d2a6591b201166fd98ba1d378cd3cc43eb8ffc461173671c422"
+}

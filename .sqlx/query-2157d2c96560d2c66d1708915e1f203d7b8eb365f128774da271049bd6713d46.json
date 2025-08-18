@@ -1,0 +1,62 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                transaction.id,\n                transaction.user_id,\n                categories.code as category_code,\n                transaction.amount,\n                transaction.description,\n                transaction.created_at,\n                transaction.type as transaction_type\n            FROM accounting_transactions transaction\n            JOIN accounting_categories as categories ON categories.id = transaction.category_id\n            WHERE\n                transaction.user_id = $1\n                AND EXTRACT(YEAR FROM transaction.created_at)::INTEGER = $2\n                AND EXTRACT(MONTH FROM transaction.created_at)::INTEGER = $3\n            ORDER BY transaction.created_at, transaction.category_id\n            LIMIT $4 OFFSET $5\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "category_code",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "amount",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 4,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 6,
+        "name": "transaction_type",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int4",
+        "Int4",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "2157d2c96560d2c66d1708915e1f203d7b8eb365f128774da271049bd6713d46"
+}
