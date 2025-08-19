@@ -5,13 +5,12 @@ services:
     image: alexey195/accountingclient:latest
     ports:
       - "8080:80"
+    restart: unless-stopped
     depends_on:
       - db
       - api
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: alexey195/accountingapi:latest
     ports:
       - "8888:8888"
     env_file:

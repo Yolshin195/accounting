@@ -45,7 +45,10 @@ fn create_cors_layer() -> CorsLayer {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    dotenv().ok();
+    // Загружаем .env только если файл существует
+    if std::path::Path::new(".env").exists() {
+        dotenv().ok();
+    }
 
     // Инициализация логгера - добавьте эту строку
     env_logger::init();
