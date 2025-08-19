@@ -13,6 +13,7 @@ Thumbs.db
 *.tmp
 
 .env
+.env-docker
 
 # Файлы IDE и редакторов
 .idea/
