@@ -5,9 +5,11 @@ services:
     image: alexey195/accountingclient:latest
     ports:
       - "3000:80"
+      - "3443:443"
+    volumes:
+      - ./certs:/etc/nginx/ssl:ro   # монтируем локальные сертификаты
     restart: unless-stopped
     depends_on:
-      - db
       - api
   api:
     image: alexey195/accountingapi:latest
