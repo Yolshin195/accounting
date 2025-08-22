@@ -4,8 +4,8 @@ services:
   client:
     image: alexey195/accountingclient:latest
     ports:
-      - "3000:80"
-      - "3443:443"
+      - "80:80"
+      - "443:443"
     volumes:
       - ./certs:/etc/nginx/ssl:ro   # монтируем локальные сертификаты
     restart: unless-stopped
