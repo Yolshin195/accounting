@@ -95,3 +95,53 @@ check:
 	docker buildx version
 	@echo "Список builders:"
 	docker buildx ls
+
+# Генерация Root CA и localhost сертификата, подписанного им
+gen-cert:
+	@echo "Генерация Root CA..."
+	mkdir -p certs
+	openssl genrsa -out certs/rootCA.key 2048
+	openssl req -x509 -new -nodes -key certs/rootCA.key -sha256 -days 1024 \
+		-out certs/rootCA.crt -subj "/CN=MyLocalRootCA"
+
+	@echo "Генерация ключа для localhost..."
+	openssl genrsa -out certs/localhost.key 2048
+
+	@echo "Создание CSR..."
+	openssl req -new -key certs/localhost.key -out certs/localhost.csr -subj "/CN=localhost"
+
+	@echo "Подпись CSR с помощью Root CA..."
+	openssl x509 -req -in certs/localhost.csr -CA certs/rootCA.crt -CAkey certs/rootCA.key \
+		-CAcreateserial -out certs/localhost.crt -days 365 -sha256
+
+	@echo "Сертификаты сгенерированы:"
+	@echo "  certs/rootCA.crt  (импортируй в доверенные в системе/браузере)"
+	@echo "  certs/rootCA.key  (держи в секрете)"
+	@echo "  certs/localhost.crt"
+	@echo "  certs/localhost.key"
+
+# Приведение dev-сертификатов к универсальным именам
+link-dev-certs:
+	@echo "Подготовка dev сертификатов под универсальные имена..."
+	mkdir -p certs
+	cp certs/localhost.crt certs/certificate.crt
+	cp certs/localhost.key certs/private.key
+	cp certs/rootCA.crt certs/root.crt
+
+# Запуск проекта (с пересборкой образа)
+up:
+	@echo "Запуск docker-compose со сборкой..."
+	docker-compose up --build -d
+
+# Остановка проекта
+down:
+	@echo "Остановка docker-compose..."
+	docker-compose down
+
+# Просмотр логов
+logs:
+	@echo "Логи docker-compose..."
+	docker-compose logs -f
+
+# Перезапуск проекта
+restart: down up

@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 /// Запрос на регистрацию
 #[derive(Debug, Deserialize)]
 pub struct CreateUserDto {
+    pub email: String,
+    #[serde(rename = "name")]
     pub username: String,
     pub password: String,
 }
