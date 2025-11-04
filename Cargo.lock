@@ -14,6 +14,7 @@ dependencies = [
  "dotenvy",
  "env_logger",
  "jsonwebtoken",
+ "rand",
  "rand_core 0.9.3",
  "rust_decimal",
  "serde",

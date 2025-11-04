@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, telegram_id, username, password_hash\n            FROM accounting_users\n            WHERE id = $1\n            ",
+  "query": "\n            SELECT id, telegram_id, username, password_hash, is_system\n            FROM accounting_users\n            WHERE id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -22,6 +22,11 @@
         "ordinal": 3,
         "name": "password_hash",
         "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "is_system",
+        "type_info": "Bool"
       }
     ],
     "parameters": {
@@ -33,8 +38,9 @@
       false,
       true,
       false,
+      false,
       false
     ]
   },
-  "hash": "5c3840b61830c93cd244c721d9b40bc436e86a3382776ff746a5da2c4c9aa14f"
+  "hash": "6b6cec579f107e2d4d041acf38f3a455dbc6b50129e391d8c84de39268748ec9"
 }

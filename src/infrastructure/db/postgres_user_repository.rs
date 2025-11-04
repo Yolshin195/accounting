@@ -20,13 +20,14 @@ impl UserRepository for PostgresUserRepository {
     async fn create(&self, user: &User) -> Result<(), anyhow::Error> {
         sqlx::query!(
             r#"
-            INSERT INTO accounting_users (id, telegram_id, username, password_hash)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO accounting_users (id, telegram_id, username, password_hash, is_system)
+            VALUES ($1, $2, $3, $4, $5)
             "#,
             user.id,
             user.telegram_id,
             user.username,
             user.password_hash,
+            user.is_system,
         )
         .execute(&self.pool)
         .await?;
@@ -36,7 +37,7 @@ impl UserRepository for PostgresUserRepository {
     async fn find_by_username(&self, username: &str) -> Result<Option<User>, anyhow::Error> {
         let record = sqlx::query!(
             r#"
-            SELECT id, telegram_id, username, password_hash
+            SELECT id, telegram_id, username, password_hash, is_system
             FROM accounting_users
             WHERE username = $1
             "#,
@@ -50,13 +51,14 @@ impl UserRepository for PostgresUserRepository {
             telegram_id: row.telegram_id,
             username: row.username,
             password_hash: row.password_hash,
+            is_system: row.is_system,
         }))
     }
 
     async fn find_by_id(&self, id: Uuid) -> Result<Option<User>, anyhow::Error> {
         let record = sqlx::query!(
             r#"
-            SELECT id, telegram_id, username, password_hash
+            SELECT id, telegram_id, username, password_hash, is_system
             FROM accounting_users
             WHERE id = $1
             "#,
@@ -70,6 +72,28 @@ impl UserRepository for PostgresUserRepository {
             telegram_id: row.telegram_id,
             username: row.username,
             password_hash: row.password_hash,
+            is_system: row.is_system,
+        }))
+    }
+    
+    async fn find_by_telegram_id(&self, telegram_id: &String) -> Result<Option<User>, anyhow::Error> {
+        let record = sqlx::query!(
+            r#"
+            SELECT id, telegram_id, username, password_hash, is_system
+            FROM accounting_users
+            WHERE telegram_id = $1
+            "#,
+            telegram_id
+        )
+            .fetch_optional(&self.pool)
+            .await?;
+
+        Ok(record.map(|row| User {
+            id: row.id,
+            telegram_id: row.telegram_id,
+            username: row.username,
+            password_hash: row.password_hash,
+            is_system: row.is_system,
         }))
     }
 }

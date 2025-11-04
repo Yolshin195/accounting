@@ -27,6 +27,7 @@ impl<R: UserRepository> UserService<R> {
             username: username.to_string(),
             password_hash,
             telegram_id: None,
+            is_system: false,
         };
 
         self.repo.create(&user).await?;

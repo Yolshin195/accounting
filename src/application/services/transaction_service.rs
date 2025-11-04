@@ -43,7 +43,10 @@ impl<TR: TransactionRepository, CR: CategoryRepository> TransactionService<TR, C
             category_id: category.unwrap().id,
             description: transaction.description,
             created_at: match transaction.date{
-                Some(date) => date.and_hms_micro_opt(0, 0, 0, 0).unwrap(),
+                Some(date) => date.and_hms_micro_opt(0, 0, 0, 0)
+                    .unwrap()
+                    .and_utc()
+                    .naive_utc(), // всегда UTC,
                 None => Utc::now().naive_utc()
             },
             transaction_type

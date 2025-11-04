@@ -4,6 +4,17 @@ use argon2::{
     password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng},
 };
 
+use rand::{distributions::Alphanumeric, Rng};
+
+/// Генерирует случайный пароль длиной `len`
+pub fn generate_password(len: usize) -> String {
+    rand::thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(len)
+        .map(char::from)
+        .collect()
+}
+
 /// Хеширует пароль с уникальной солью и возвращает PHC string
 pub fn hash_password(password: &str) -> Result<String> {
     let salt = SaltString::generate(&mut OsRng);

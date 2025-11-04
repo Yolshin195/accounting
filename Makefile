@@ -129,9 +129,13 @@ link-dev-certs:
 	cp certs/rootCA.crt certs/root.crt
 
 # Запуск проекта (с пересборкой образа)
-up:
+rebuild: down
 	@echo "Запуск docker-compose со сборкой..."
 	docker-compose up --build -d
+
+up:
+	@echo "Запуск docker-compose"
+	docker-compose up -d
 
 # Остановка проекта
 down:

@@ -1,3 +1,5 @@
+use crate::infrastructure::db::init_data::create_telegram_client_user;
+
 use sqlx::{PgPool, migrate::Migrator, postgres::PgPoolOptions};
 use std::env;
 
@@ -17,6 +19,8 @@ pub async fn init_pg_pool() -> anyhow::Result<PgPool> {
         .await?;
 
     MIGRATOR.run(&pool).await?;
+
+    create_telegram_client_user(&pool).await?;
 
     Ok(pool)
 }

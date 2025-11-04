@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO accounting_users (id, telegram_id, username, password_hash, is_system)\n            VALUES ($1, $2, $3, $4, $5)\n            ON CONFLICT (username) DO NOTHING\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d55353344ac9783c52a6c20dc0d43b786854d84f2bab6090898afa88bf00c166"
+}

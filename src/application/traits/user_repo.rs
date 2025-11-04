@@ -7,4 +7,5 @@ pub trait UserRepository: Send + Sync {
     async fn create(&self, user: &User) -> Result<(), anyhow::Error>;
     async fn find_by_username(&self, username: &str) -> Result<Option<User>, anyhow::Error>;
     async fn find_by_id(&self, id: Uuid) -> Result<Option<User>, anyhow::Error>;
+    async fn find_by_telegram_id(&self, telegram_id: &String) -> Result<Option<User>, anyhow::Error>;
 }

@@ -205,3 +205,20 @@ src
         - Порты для сервисов
     - Сервисы (Реализация)
         -
+
+
+
+### Выпустить самоподписанные сертификат
+```shell
+# 1. Создаём root CA
+openssl genrsa -out rootCA.key 2048
+openssl req -x509 -new -nodes -key rootCA.key -sha256 -days 1024 -out rootCA.crt -subj "/CN=MyRootCA"
+
+# 2. Создаём приватный ключ и CSR для сайта
+openssl genrsa -out private.key 2048
+openssl req -new -key private.key -out certificate.csr -subj "/CN=pinpan.ru"
+
+# 3. Подписываем CSR root CA, получаем сертификат
+openssl x509 -req -in certificate.csr -CA rootCA.crt -CAkey rootCA.key -CAcreateserial -out certificate.crt -days 500 -sha256
+
+```
