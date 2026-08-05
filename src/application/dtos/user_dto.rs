@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 /// Запрос на регистрацию
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 pub struct CreateUserDto {
     pub email: String,
     #[serde(rename = "name")]
@@ -10,14 +11,14 @@ pub struct CreateUserDto {
 }
 
 /// Запрос на обычный логин
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 pub struct LoginRequest {
     pub username: String,
     pub password: String,
 }
 
 /// Ответ с access/refresh токенами
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct JwtResponse {
     #[serde(rename = "token")]
     pub access_token: String,
@@ -25,7 +26,7 @@ pub struct JwtResponse {
 }
 
 /// Запрос от Telegram бота
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 pub struct LoginTelegramBotDto {
     pub client_id: String,
     pub secret: String,

@@ -7,6 +7,20 @@ use axum::extract::Path;
 use axum::http::StatusCode;
 use crate::application::dtos::pagination_dto::{PagedResponse, Pagination};
 
+#[utoipa::path(
+    post,
+    path = "/categories",
+    tag = "categories",
+    request_body = CreateCategoryDto,
+    responses(
+        (status = 200, description = "Категория успешно создана", body = CategoryDto),
+        (status = 401, description = "Пользователь не авторизован"),
+        (status = 500, description = "Внутренняя ошибка сервера")
+    ),
+    security(
+        ("bearer_auth" = [])
+    )
+)]
 pub async fn create_category(
     State(state): State<Arc<CategoryAppState>>,
     Extension(user): Extension<User>,
@@ -20,6 +34,22 @@ pub async fn create_category(
     Json(created)
 }
 
+
+#[utoipa::path(
+    get,
+    path = "/categories",
+    tag = "categories",
+    params(
+        Pagination
+    ),
+    responses(
+        (status = 200, description = "Получен список категорий", body = PagedResponse<CategoryDto>),
+        (status = 401, description = "Пользователь не авторизован")
+    ),
+    security(
+        ("bearer_auth" = [])
+    )
+)]
 pub async fn list_categories(
     State(state): State<Arc<CategoryAppState>>,
     Query(pagination): Query<Pagination>,
@@ -29,6 +59,24 @@ pub async fn list_categories(
     Json(page)
 }
 
+
+#[utoipa::path(
+    delete,
+    path = "/categories/{code}",
+    tag = "categories",
+    params(
+        ("code" = String, Path, description = "Уникальный код категории для удаления")
+    ),
+    responses(
+        (status = 204, description = "Категория успешно удалена"),
+        (status = 401, description = "Пользователь не авторизован"),
+        (status = 404, description = "Категория не найдена"),
+        (status = 500, description = "Внутренняя ошибка сервера")
+    ),
+    security(
+        ("bearer_auth" = [])
+    )
+)]
 pub async fn delete_category_by_code(
     State(state): State<Arc<CategoryAppState>>,
     Extension(user): Extension<User>,

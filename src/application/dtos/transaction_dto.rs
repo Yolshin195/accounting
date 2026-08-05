@@ -1,10 +1,11 @@
 use chrono::{DateTime, NaiveDate, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use utoipa::{IntoParams, ToSchema};
 use uuid::Uuid;
 use crate::application::dtos::pagination_dto::Pagination;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, ToSchema)]
 pub struct TransactionDto {
     pub id: Uuid,
     #[serde(with = "rust_decimal::serde::float")]
@@ -17,7 +18,7 @@ pub struct TransactionDto {
     pub transaction_type: String, // "INCOME" or "EXPENSE"
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, ToSchema)]
 pub struct UpdateTransactionDto {
     #[serde(with = "rust_decimal::serde::float")]
     pub amount: Decimal,
@@ -28,7 +29,7 @@ pub struct UpdateTransactionDto {
 }
 
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, ToSchema)]
 pub struct CreateTransactionDto {
     pub amount: Decimal,
     #[serde(rename = "category")]
@@ -37,7 +38,7 @@ pub struct CreateTransactionDto {
     pub date: Option<NaiveDate>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema, IntoParams)]
 pub struct MonthlyTransactionQuery {
     pub year: Option<u32>,
     pub month: Option<u32>,
@@ -45,7 +46,7 @@ pub struct MonthlyTransactionQuery {
     pub pagination: Pagination,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, ToSchema)]
 pub struct CategoryExpenseSummaryDto {
     #[serde(rename = "categoryCode")]
     pub category_code: String,

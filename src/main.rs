@@ -12,11 +12,14 @@ use crate::infrastructure::db::db::init_pg_pool;
 use crate::infrastructure::db::postgres_category_repository::PostgresCategoryRepo;
 use crate::infrastructure::db::postgres_user_repository::PostgresUserRepository;
 use crate::interface::http::middleware::auth_middleware::{JwtMiddlewareState, jwt_middleware};
+use crate::interface::http::openapi::ApiDoc;
 use crate::interface::http::routes::category_routes::category_routes;
 use crate::interface::http::routes::user_routes::user_routes;
 use axum::http::Method;
 use axum::{Router, http, middleware};
 use dotenvy::dotenv;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 use std::env;
 use std::sync::Arc;
 use tower_http::cors::{Any, CorsLayer};
@@ -95,6 +98,7 @@ async fn main() -> anyhow::Result<()> {
     let app = Router::new()
         .merge(private_router)
         .merge(public_router)
+        .merge(SwaggerUi::new("/docs").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .layer(create_cors_layer())
         .layer(TraceLayer::new_for_http());
 
