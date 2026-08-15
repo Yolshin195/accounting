@@ -1,5 +1,4 @@
 use chrono::{Datelike, NaiveDate, Utc};
-use rust_decimal::Decimal;
 use uuid::Uuid;
 use crate::application::dtos::pagination_dto::{PagedResponse, Pagination};
 use crate::application::dtos::transaction_dto::{CategoryExpenseSummaryDto, CreateTransactionDto, TransactionDto, UpdateTransactionDto};

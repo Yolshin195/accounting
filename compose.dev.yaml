@@ -1,0 +1,23 @@
+services:
+  client:
+    image: alexey195/accountingclient:latest
+    ports:
+      - "8080:80"
+      - "3443:443"
+    volumes:
+      - ./certs:/etc/nginx/ssl:ro   # монтируем локальные сертификаты
+    restart: unless-stopped
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=accounting_db
+    volumes:
+      - accounting_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5445:5432"
+    restart: unless-stopped
+
+volumes:
+  accounting_postgres_data:

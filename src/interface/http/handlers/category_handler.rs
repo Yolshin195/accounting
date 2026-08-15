@@ -10,7 +10,7 @@ use crate::application::dtos::pagination_dto::{PagedResponse, Pagination};
 #[utoipa::path(
     post,
     path = "/categories",
-    tag = "categories",
+    tag = "Categories",
     request_body = CreateCategoryDto,
     responses(
         (status = 200, description = "Категория успешно создана", body = CategoryDto),
@@ -38,7 +38,7 @@ pub async fn create_category(
 #[utoipa::path(
     get,
     path = "/categories",
-    tag = "categories",
+    tag = "Categories",
     params(
         Pagination
     ),
@@ -63,7 +63,7 @@ pub async fn list_categories(
 #[utoipa::path(
     delete,
     path = "/categories/{code}",
-    tag = "categories",
+    tag = "Categories",
     params(
         ("code" = String, Path, description = "Уникальный код категории для удаления")
     ),
