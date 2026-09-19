@@ -2,10 +2,12 @@ version: '3.8'
 
 services:
   client:
-    image: alexey195/accountingclient:latest
+    image: ghcr.io/yolshin195/accounting_client:latest
     ports:
       - "8080:80"
       - "3443:443"
+    environment:
+      API_UPSTREAM: api:8888
     volumes:
       - ./certs:/etc/nginx/ssl:ro   # монтируем локальные сертификаты
     restart: unless-stopped
