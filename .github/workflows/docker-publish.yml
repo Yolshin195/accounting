@@ -54,23 +54,3 @@ jobs:
             ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-  deploy-remote:
-    name: Deploy to remote Debian server
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' && vars.DEPLOY_HOST != '' }}
-    steps:
-      - name: Deploy over SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ vars.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          port: ${{ vars.DEPLOY_PORT || 22 }}
-          script: |
-            set -e
-            cd ${{ vars.DEPLOY_PATH }}
-            docker compose -f compose.prod.yaml pull
-            docker compose -f compose.prod.yaml up -d
-            docker image prune -f
