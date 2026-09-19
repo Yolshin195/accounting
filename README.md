@@ -1,5 +1,69 @@
 # Accounting API
 
+## Docker: сборка и деплой (Linux/Debian сервер + MacBook M3)
+
+Образ `ghcr.io/yolshin195/accountingapi` собирается как multi-arch
+(`linux/amd64` + `linux/arm64`) и публикуется под тегом `latest` в GitHub
+Container Registry, поэтому один и тот же `compose.prod.yaml` работает без
+изменений и на удалённом Debian-сервере (amd64), и локально на MacBook M3
+(arm64) — Docker сам подтягивает нужный слой образа под архитектуру хоста.
+
+### CI/CD
+
+Сборка и публикация в GitHub Container Registry (ghcr.io) выполняются
+автоматически workflow'ом `.github/workflows/docker-publish.yml` при пуше в
+`main` (или вручную через "Run workflow"). Публикация использует
+встроенный `GITHUB_TOKEN` — отдельные секреты для реестра не нужны, но
+у токена должно быть право `packages: write` (уже выставлено в workflow
+через `permissions:`).
+
+Пакет `accountingapi` создаётся приватным по умолчанию. Чтобы
+`docker compose pull` на удалённом сервере и на Mac работал без логина,
+сделайте пакет публичным: GitHub → профиль/организация → Packages →
+`accountingapi` → Package settings → Change visibility → Public. Если
+пакет должен оставаться приватным, перед `pull` нужно один раз выполнить
+`docker login ghcr.io -u <username>` с personal access token (`read:packages`)
+и на сервере, и на Mac.
+
+Для автодеплоя на удалённый сервер нужно добавить в репозиторий:
+
+**Secrets** (Settings → Secrets and variables → Actions → Secrets):
+- `DEPLOY_USER`, `DEPLOY_SSH_KEY` — пользователь и приватный SSH-ключ для деплоя на удалённый сервер.
+
+**Variables** (там же, вкладка Variables):
+- `DEPLOY_HOST` — адрес удалённого Debian-сервера.
+- `DEPLOY_PATH` — путь к проекту на сервере (где лежит `compose.prod.yaml`).
+- `DEPLOY_PORT` — SSH-порт (необязательно, по умолчанию 22).
+
+Если `DEPLOY_HOST` не задан, шаг деплоя на сервер пропускается — workflow
+только соберёт и опубликует образ.
+
+### Деплой на удалённый Debian-сервер
+
+Выполняется автоматически job'ом `deploy-remote` после публикации образа:
+`docker compose -f compose.prod.yaml pull && docker compose -f compose.prod.yaml up -d`
+на сервере в директории `DEPLOY_PATH`.
+
+### Запуск на MacBook M3
+
+CI не может деплоить на локальный Mac, поэтому после публикации образа
+достаточно обновить его вручную:
+
+```shell
+docker compose -f compose.prod.yaml pull
+docker compose -f compose.prod.yaml up -d
+```
+
+Docker автоматически скачает `arm64`-вариант образа.
+
+### Ручная сборка (без CI)
+
+Через `Makefile` (использует `docker buildx` и те же платформы):
+
+```shell
+make login   # docker login ghcr.io, один раз
+make build-push
+```
 
 ## SqlX migration
 create migration
