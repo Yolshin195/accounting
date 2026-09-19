@@ -2,20 +2,32 @@
 
 ## Docker: сборка и деплой (Linux/Debian сервер + MacBook M3)
 
-Образ `alexey195/accountingapi` собирается как multi-arch (`linux/amd64` + `linux/arm64`)
-и публикуется под тегом `latest`, поэтому один и тот же
-`compose.prod.yaml` работает без изменений и на удалённом Debian-сервере
-(amd64), и локально на MacBook M3 (arm64) — Docker сам подтягивает нужный
-слой образа под архитектуру хоста.
+Образ `ghcr.io/yolshin195/accountingapi` собирается как multi-arch
+(`linux/amd64` + `linux/arm64`) и публикуется под тегом `latest` в GitHub
+Container Registry, поэтому один и тот же `compose.prod.yaml` работает без
+изменений и на удалённом Debian-сервере (amd64), и локально на MacBook M3
+(arm64) — Docker сам подтягивает нужный слой образа под архитектуру хоста.
 
 ### CI/CD
 
-Сборка и публикация в Docker Hub выполняются автоматически workflow'ом
-`.github/workflows/docker-publish.yml` при пуше в `main` (или вручную через
-"Run workflow"). Для его работы нужно добавить в репозиторий:
+Сборка и публикация в GitHub Container Registry (ghcr.io) выполняются
+автоматически workflow'ом `.github/workflows/docker-publish.yml` при пуше в
+`main` (или вручную через "Run workflow"). Публикация использует
+встроенный `GITHUB_TOKEN` — отдельные секреты для реестра не нужны, но
+у токена должно быть право `packages: write` (уже выставлено в workflow
+через `permissions:`).
+
+Пакет `accountingapi` создаётся приватным по умолчанию. Чтобы
+`docker compose pull` на удалённом сервере и на Mac работал без логина,
+сделайте пакет публичным: GitHub → профиль/организация → Packages →
+`accountingapi` → Package settings → Change visibility → Public. Если
+пакет должен оставаться приватным, перед `pull` нужно один раз выполнить
+`docker login ghcr.io -u <username>` с personal access token (`read:packages`)
+и на сервере, и на Mac.
+
+Для автодеплоя на удалённый сервер нужно добавить в репозиторий:
 
 **Secrets** (Settings → Secrets and variables → Actions → Secrets):
-- `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` — логин/токен для публикации образа.
 - `DEPLOY_USER`, `DEPLOY_SSH_KEY` — пользователь и приватный SSH-ключ для деплоя на удалённый сервер.
 
 **Variables** (там же, вкладка Variables):
@@ -49,7 +61,8 @@ Docker автоматически скачает `arm64`-вариант обра
 Через `Makefile` (использует `docker buildx` и те же платформы):
 
 ```shell
-make build-push DOCKER_USERNAME=alexey195 IMAGE_NAME=accountingapi
+make login   # docker login ghcr.io, один раз
+make build-push
 ```
 
 ## SqlX migration

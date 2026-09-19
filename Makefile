@@ -1,11 +1,12 @@
 # Переменные
-DOCKER_USERNAME ?= alexey195
+REGISTRY ?= ghcr.io
+DOCKER_USERNAME ?= yolshin195
 IMAGE_NAME ?= accountingapi
 VERSION ?= latest
 PLATFORMS = linux/amd64,linux/arm64
 
 # Полное имя образа
-FULL_IMAGE_NAME = $(DOCKER_USERNAME)/$(IMAGE_NAME):$(VERSION)
+FULL_IMAGE_NAME = $(REGISTRY)/$(DOCKER_USERNAME)/$(IMAGE_NAME):$(VERSION)
 
 .PHONY: help build push build-push login setup-buildx clean
 
@@ -14,14 +15,15 @@ help:
 	@echo "Доступные команды:"
 	@echo "  setup-buildx  - Настройка buildx для multi-platform сборки"
 	@echo "  build        - Сборка Docker образа для multi-platform"
-	@echo "  push         - Загрузка образа в Docker Hub"
+	@echo "  push         - Загрузка образа в GitHub Container Registry"
 	@echo "  build-push   - Сборка и загрузка образа"
-	@echo "  login        - Авторизация в Docker Hub"
+	@echo "  login        - Авторизация в GitHub Container Registry"
 	@echo "  clean        - Очистка buildx builder"
 	@echo ""
 	@echo "Переменные окружения:"
-	@echo "  DOCKER_USERNAME - имя пользователя Docker Hub (по умолчанию: your-username)"
-	@echo "  IMAGE_NAME      - имя образа (по умолчанию: your-app-name)"
+	@echo "  REGISTRY        - реестр образов (по умолчанию: ghcr.io)"
+	@echo "  DOCKER_USERNAME - владелец образа в реестре (по умолчанию: yolshin195)"
+	@echo "  IMAGE_NAME      - имя образа (по умолчанию: accountingapi)"
 	@echo "  VERSION         - версия образа (по умолчанию: latest)"
 
 # Настройка buildx для multi-platform сборки
@@ -30,10 +32,10 @@ setup-buildx:
 	docker buildx create --name multiarch --driver docker-container --use || true
 	docker buildx inspect --bootstrap
 
-# Авторизация в Docker Hub
+# Авторизация в GitHub Container Registry (нужен personal access token с правом write:packages)
 login:
-	@echo "Авторизация в Docker Hub..."
-	docker login
+	@echo "Авторизация в $(REGISTRY)..."
+	docker login $(REGISTRY)
 
 # Сборка образа для multiple платформ
 build: setup-buildx

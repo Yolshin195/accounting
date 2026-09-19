@@ -14,7 +14,7 @@ services:
     depends_on:
       - api
   api:
-    image: alexey195/accountingapi:latest
+    image: ghcr.io/yolshin195/accountingapi:latest
     ports:
       - "8888:8888"
     env_file:
