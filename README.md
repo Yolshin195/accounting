@@ -38,12 +38,6 @@ Container Registry, поэтому один и тот же `compose.prod.yaml` �
 Если `DEPLOY_HOST` не задан, шаг деплоя на сервер пропускается — workflow
 только соберёт и опубликует образ.
 
-### Деплой на удалённый Debian-сервер
-
-Выполняется автоматически job'ом `deploy-remote` после публикации образа:
-`docker compose -f compose.prod.yaml pull && docker compose -f compose.prod.yaml up -d`
-на сервере в директории `DEPLOY_PATH`.
-
 ### Запуск на MacBook M3
 
 CI не может деплоить на локальный Mac, поэтому после публикации образа
