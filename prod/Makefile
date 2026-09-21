@@ -40,6 +40,8 @@ BACKUP_KEEP_DAYS ?= 14
 RENEW_DAYS    ?= 30
 # Как часто cron проверяет новые образы (формат cron)
 AUTO_UPDATE_SCHEDULE ?= */15 * * * *
+# root или sudo — нужен, чтобы поставить пакет cron, если его нет
+SUDO := $(shell [ "$$(id -u)" = "0" ] && echo "" || command -v sudo)
 
 # DOMAIN и EMAIL берутся из .env (или: make cert DOMAIN=... EMAIL=...)
 DOMAIN ?= $(shell grep -E '^DOMAIN=' .env 2>/dev/null | cut -d= -f2-)
@@ -47,7 +49,7 @@ EMAIL  ?= $(shell grep -E '^EMAIL=' .env 2>/dev/null | cut -d= -f2-)
 
 .DEFAULT_GOAL := help
 .PHONY: help check check-cert login deploy update up down restart ps logs \
-        cert renew-cert install-cron backup \
+        cert renew-cert ensure-cron install-cron backup \
         auto-update install-auto-update uninstall-auto-update \
         push check-server env
 
@@ -169,7 +171,28 @@ renew-cert: check check-cert ## Обновить сертификат, толь�
 		$(MAKE) cert; \
 	fi
 
-install-cron: ## Автопродление сертификата (каждый понедельник в 04:00)
+ensure-cron: ## Поставить и включить cron, если его ещё нет (используется install-cron/install-auto-update)
+	@if ! command -v crontab >/dev/null 2>&1; then \
+		echo "crontab не найден, ставлю пакет cron..."; \
+		if command -v apt-get >/dev/null 2>&1; then \
+			$(SUDO) apt-get update -qq && $(SUDO) apt-get install -y cron; \
+		elif command -v yum >/dev/null 2>&1; then \
+			$(SUDO) yum install -y cronie; \
+		elif command -v apk >/dev/null 2>&1; then \
+			$(SUDO) apk add --no-cache cronie; \
+		else \
+			echo "Не знаю, как поставить cron на этой системе. Поставь вручную (пакет cron/cronie) и повтори."; exit 1; \
+		fi; \
+	fi
+	@if command -v systemctl >/dev/null 2>&1; then \
+		$(SUDO) systemctl enable --now cron 2>/dev/null || $(SUDO) systemctl enable --now crond 2>/dev/null || true; \
+	elif command -v service >/dev/null 2>&1; then \
+		$(SUDO) service cron start 2>/dev/null || $(SUDO) service crond start 2>/dev/null || true; \
+	fi
+	@command -v crontab >/dev/null 2>&1 || { echo "crontab всё ещё недоступен"; exit 1; }
+
+install-cron: ensure-cron ## Автопродление сертификата (каждый понедельник в 04:00); сама ставит cron, если его нет
+	@touch $(CURDIR)/renew.log
 	@( crontab -l 2>/dev/null | grep -v 'accounting-cert-renew'; \
 	   echo "0 4 * * 1 cd $(CURDIR) && flock $(CURDIR)/.lock $(MAKE) renew-cert >> $(CURDIR)/renew.log 2>&1 # accounting-cert-renew" ) | crontab -
 	@echo "Cron установлен:"
@@ -199,10 +222,15 @@ auto-update: check ## Проверить новые образы и обнови
 	&& echo "[$$(date '+%F %T')] обновлено" \
 	|| { echo "[$$(date '+%F %T')] ОШИБКА обновления"; exit 1; }
 
-install-auto-update: ## Включить автообновление контейнеров (cron, по умолчанию каждые 15 минут)
+install-auto-update: check ensure-cron ## Включить автообновление контейнеров (cron, по умолчанию каждые 15 минут); сама ставит cron и проверяет, что всё работает
+	@touch $(CURDIR)/.lock $(CURDIR)/auto-update.log
 	@( crontab -l 2>/dev/null | grep -v 'accounting-auto-update'; \
 	   echo "$(AUTO_UPDATE_SCHEDULE) cd $(CURDIR) && flock -n $(CURDIR)/.lock $(MAKE) auto-update >> $(CURDIR)/auto-update.log 2>&1 # accounting-auto-update" ) | crontab -
 	@echo "Автообновление включено: $(AUTO_UPDATE_SCHEDULE)"
+	@crontab -l | grep accounting-auto-update
+	@echo "Проверяю, что автообновление действительно работает..."
+	@$(MAKE) --no-print-directory auto-update
+	@echo "Готово: автообновление настроено и проверено."
 
 uninstall-auto-update: ## Выключить автообновление
 	@crontab -l 2>/dev/null | grep -v 'accounting-auto-update' | crontab -
