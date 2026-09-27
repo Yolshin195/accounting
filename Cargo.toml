@@ -16,6 +16,7 @@ anyhow = "1.0.98"
 argon2 = { version = "0.5.3", features = ["rand", "simple"] }
 rand_core = { version = "0.9.3", features = ["std"] }
 env_logger = "0.11.8"
+log = "0.4.34"
 axum = "0.8.9"
 dotenvy = "0.15"
 tower-http = { version = "0.6.6", features = ["trace", "cors"] }

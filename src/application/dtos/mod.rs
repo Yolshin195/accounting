@@ -2,3 +2,6 @@ pub mod category_dto;
 pub mod user_dto;
 pub mod pagination_dto;
 pub mod transaction_dto;
+pub mod reference_dto;
+pub mod currency_dto;
+pub mod account_dto;

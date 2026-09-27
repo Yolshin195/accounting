@@ -157,3 +157,77 @@ Accept: application/json
 Content-Type: application/json
 authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiNGFhNTk2MC0zNWFiLTQ3MzAtOTAyMS0zZDYxMDRjNWE1ZjAiLCJleHAiOjE3NTQ4OTI0MjcsImp0aSI6IjYzY2Y5NWE0LTQyYzctNDgwYy05ODZkLTAwZTE0MTllYTI2NCIsInRva2VuX3R5cGUiOiJhY2Nlc3MifQ.XmkMlPuiXka2Nz5uq3JVs1_EW0tPp9_rHdv8cj_Ns7clWTS1yuj7JtSo9oEIsBbvNgGCEvSHvNmDBMJdd2F5MA
 
+### Справочники: валюты
+
+POST http://localhost:8888/currencies
+Accept: application/json
+Content-Type: application/json
+authorization: Bearer {{token}}
+
+{
+  "code": "RUB",
+  "name": "Российский рубль",
+  "symbol": "₽",
+  "isBase": true
+}
+
+###
+
+GET http://localhost:8888/currencies?q=руб&includeArchived=false
+Accept: application/json
+authorization: Bearer {{token}}
+
+###
+
+### Справочники: счета
+
+POST http://localhost:8888/accounts
+Accept: application/json
+Content-Type: application/json
+authorization: Bearer {{token}}
+
+{
+  "code": "CARD",
+  "name": "Карта",
+  "currency": "RUB",
+  "accountType": "CARD",
+  "initialBalance": "1500.50"
+}
+
+###
+
+GET http://localhost:8888/accounts?page=0&size=20
+Accept: application/json
+authorization: Bearer {{token}}
+
+###
+
+GET http://localhost:8888/accounts/CARD
+Accept: application/json
+authorization: Bearer {{token}}
+
+###
+
+PUT http://localhost:8888/accounts/CARD
+Accept: application/json
+Content-Type: application/json
+authorization: Bearer {{token}}
+
+{
+  "name": "Карта Т-Банк",
+  "currency": "RUB",
+  "accountType": "CARD",
+  "initialBalance": 0
+}
+
+###
+
+DELETE http://localhost:8888/accounts/CARD
+Accept: application/json
+authorization: Bearer {{token}}
+
+###
+
+POST http://localhost:8888/accounts/CARD/restore
+Accept: application/json
+authorization: Bearer {{token}}

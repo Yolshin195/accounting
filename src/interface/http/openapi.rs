@@ -11,7 +11,16 @@ use crate::application::dtos::transaction_dto::{
 use crate::application::dtos::user_dto::{
     CreateUserDto, JwtResponse, LoginRequest, LoginTelegramBotDto,
 };
-use crate::interface::http::handlers::{category_handler, transaction_handler, user_handler};
+use crate::application::dtos::account_dto::{AccountDto, AccountFields, CreateAccountDto, UpdateAccountDto};
+use crate::application::dtos::currency_dto::{CreateCurrencyDto, CurrencyDto, CurrencyFields, UpdateCurrencyDto};
+use crate::application::dtos::reference_dto::{
+    CreateReferenceBaseDto, ErrorResponse, ReferenceBaseDto, UpdateReferenceBaseDto,
+};
+use crate::domain::account::AccountType;
+use crate::domain::reference::FieldError;
+use crate::interface::http::handlers::{
+    account_handler, category_handler, currency_handler, transaction_handler, user_handler,
+};
 
 struct SecurityAddon;
 
@@ -53,6 +62,18 @@ impl Modify for SecurityAddon {
         transaction_handler::update_transaction,
         transaction_handler::find_transaction_by_id,
         transaction_handler::sum_today_expenses_grouped_by_category,
+        currency_handler::list_currencies,
+        currency_handler::get_currency,
+        currency_handler::create_currency,
+        currency_handler::update_currency,
+        currency_handler::archive_currency,
+        currency_handler::restore_currency,
+        account_handler::list_accounts,
+        account_handler::get_account,
+        account_handler::create_account,
+        account_handler::update_account,
+        account_handler::archive_account,
+        account_handler::restore_account,
     ),
     components(schemas(
         CreateUserDto,
@@ -68,12 +89,29 @@ impl Modify for SecurityAddon {
         Pagination,
         PageInfo,
         PagedResponse<CategoryDto>,
-        PagedResponse<TransactionDto>
+        PagedResponse<TransactionDto>,
+        ReferenceBaseDto,
+        CreateReferenceBaseDto,
+        UpdateReferenceBaseDto,
+        ErrorResponse,
+        FieldError,
+        CurrencyFields,
+        CurrencyDto,
+        CreateCurrencyDto,
+        UpdateCurrencyDto,
+        PagedResponse<CurrencyDto>,
+        AccountType,
+        AccountFields,
+        AccountDto,
+        CreateAccountDto,
+        UpdateAccountDto,
+        PagedResponse<AccountDto>
     )),
     tags(
         (name = "Users", description = "Регистрация и аутентификация пользователей"),
         (name = "Categories", description = "Управление категориями доходов/расходов"),
         (name = "Transactions", description = "Управление транзакциями"),
+        (name = "References", description = "Справочники: у всех одинаковые ручки и базовые поля (ReferenceBaseDto)"),
     ),
     modifiers(&SecurityAddon)
 )]

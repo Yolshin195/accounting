@@ -1,0 +1,21 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE accounting_currencies\n            SET name = $3, description = $4, sort_order = $5, symbol = $6, decimals = $7, is_base = $8\n            WHERE id = $1 AND user_id = $2\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Int4",
+        "Text",
+        "Int4",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "aa1f7c3b0a41d9112c49ac77b2aebdd0c72ddc3e61794138bbe9a6f054dfb01a"
+}

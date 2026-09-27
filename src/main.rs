@@ -27,6 +27,13 @@ use tower_http::trace::TraceLayer;
 use crate::application::services::transaction_service::TransactionService;
 use crate::infrastructure::db::postgres_transaction_repository::PostgresTransactionRepo;
 use crate::interface::http::routes::transaction_routes::get_transaction_routes;
+use crate::application::services::account_service::AccountService;
+use crate::application::services::currency_service::CurrencyService;
+use crate::infrastructure::app_state::{AccountAppState, CurrencyAppState};
+use crate::infrastructure::db::postgres_account_repository::PostgresAccountRepository;
+use crate::infrastructure::db::postgres_currency_repository::PostgresCurrencyRepository;
+use crate::interface::http::routes::account_routes::account_routes;
+use crate::interface::http::routes::currency_routes::currency_routes;
 
 fn create_cors_layer() -> CorsLayer {
     CorsLayer::new()
@@ -80,6 +87,18 @@ async fn main() -> anyhow::Result<()> {
         transaction_service
     };
     
+    // Справочники
+    let currency_repo = PostgresCurrencyRepository { pool: db_pool.clone() };
+    let currency_app_state = CurrencyAppState {
+        currency_service: CurrencyService::new(currency_repo.clone()),
+    };
+    let account_app_state = AccountAppState {
+        account_service: AccountService::new(
+            PostgresAccountRepository { pool: db_pool.clone() },
+            currency_repo.clone(),
+        ),
+    };
+
     let jwt_middleware_state = Arc::new(JwtMiddlewareState {
         jwt_service: jwt_service.clone(),
         user_repo: Arc::new(user_repo.clone()),
@@ -88,6 +107,8 @@ async fn main() -> anyhow::Result<()> {
     let private_router = Router::new()
         .nest("/categories", category_routes(Arc::new(category_app_state)))
         .nest("/transactions", get_transaction_routes(Arc::new(transaction_app_state)))
+        .nest("/currencies", currency_routes(Arc::new(currency_app_state)))
+        .nest("/accounts", account_routes(Arc::new(account_app_state)))
         .layer(middleware::from_fn_with_state(
             jwt_middleware_state,
             jwt_middleware,
