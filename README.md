@@ -138,49 +138,57 @@ Authorization: Bearer {token}
 
 ## Справочники
 
-Все справочники (сейчас — **валюты** `currencies` и **счета** `accounts`) имеют один общий
-интерфейс. Клиенту не нужно знать о конкретных справочниках: он получает их описание из API
-и строит меню, таблицы и формы автоматически.
+Справочники — **валюты** (`/currencies`) и **счета** (`/accounts`). Каждый справочник —
+самостоятельная сущность со своей таблицей, DTO и ручками (как транзакции и категории),
+но все они устроены по одному шаблону, поэтому у клиента для всех один и тот же контракт.
+Схемы полей клиент берёт из OpenAPI (`/api-docs/openapi.json`, тег `References`).
 
-| Метод    | Путь                                  | Описание                                              |
-|----------|---------------------------------------|-------------------------------------------------------|
-| `GET`    | `/references`                         | Описание всех справочников (поля, типы, подписи)      |
-| `GET`    | `/references/{kind}`                  | Список записей: `?page&size&q&includeArchived`        |
-| `GET`    | `/references/{kind}/{code}`           | Одна запись                                           |
-| `POST`   | `/references/{kind}`                  | Создать запись (201)                                  |
-| `PUT`    | `/references/{kind}/{code}`           | Полное обновление, `code` не меняется                 |
-| `DELETE` | `/references/{kind}/{code}`           | Перенести в архив (204)                               |
-| `POST`   | `/references/{kind}/{code}/restore`   | Вернуть из архива                                     |
+| Метод    | Путь                    | Описание                                  |
+|----------|-------------------------|-------------------------------------------|
+| `GET`    | `/{ref}`                | Список: `?page&size&q&includeArchived`    |
+| `GET`    | `/{ref}/{code}`         | Одна запись                               |
+| `POST`   | `/{ref}`                | Создать (201)                             |
+| `PUT`    | `/{ref}/{code}`         | Полное обновление, `code` не меняется     |
+| `DELETE` | `/{ref}/{code}`         | Перенести в архив (204)                   |
+| `POST`   | `/{ref}/{code}/restore` | Вернуть из архива                         |
 
-Запись — плоский JSON: базовые поля `id, code, name, description, sortOrder, isArchived`
-+ поля справочника. Ссылки на другие справочники передаются по `code`, десятичные числа
-возвращаются строкой (как суммы транзакций):
+У всех записей есть базовые поля `id, code, name, description, sortOrder, isArchived`
+(`ReferenceBaseDto`) + поля справочника. Ссылки на другие справочники передаются по `code`,
+десятичные числа возвращаются строкой (как суммы транзакций):
 
 ```json
 { "code": "CARD", "name": "Карта", "currency": "RUB", "accountType": "CARD", "initialBalance": "1500.50" }
 ```
 
-Описание поля в `GET /references`:
-
-```json
-{ "name": "currency", "title": "Валюта", "type": "reference", "reference": "currencies", "required": true }
-```
-
-Типы полей: `string`, `text`, `integer`, `decimal`, `boolean`, `date`, `enum` (варианты в `options`),
-`reference` (список значений — `GET /references/{reference}`).
-
-Ошибки: `{ "error": "validation" | "conflict" | "not_found" | "unknown_reference" | "internal", "message": "...", "fields": [{ "field": "name", "message": "..." }] }`
-с кодами 400 / 409 / 404 / 404 / 500.
+Ошибки: `{ "error": "validation" | "conflict" | "not_found" | "internal", "message": "...", "fields": [{ "field": "name", "message": "..." }] }`
+с кодами 400 / 409 / 404 / 500.
 
 ### Как добавить новый справочник
 
-1. Миграция: таблица с колонками `id, user_id, code, name, description, sort_order, is_archived`,
-   `UNIQUE (user_id, code)` + свои колонки (см. `migrations/*_create_table_accounting_accounts.up.sql`).
-2. Файл `src/domain/references/<name>.rs` с функцией `descriptor()` — описание полей
-   (см. `account.rs`).
-3. Строка `.register(<name>::descriptor())` в `src/domain/references/mod.rs`.
+Образец — счета (`account`). Для справочника `foo`:
 
-SQL, валидация, эндпоинты и Swagger подхватываются автоматически.
+1. **Миграция** `sqlx migrate add -r create_table_accounting_foos`: базовые колонки
+   `id, user_id, code, name, description, sort_order, is_archived`, свои колонки и `UNIQUE (user_id, code)`.
+2. **Домен** `src/domain/foo.rs`: `struct Foo { #[sqlx(flatten)] pub base: ReferenceBase, ...свои поля }`.
+3. **DTO** `src/application/dtos/foo_dto.rs`: `FooFields` (свои поля + `validate`), `FooDto`
+   (`#[serde(flatten)] base: ReferenceBaseDto`), `CreateFooDto` / `UpdateFooDto`
+   (`#[serde(flatten)] base: Create/UpdateReferenceBaseDto` + `#[serde(flatten)] fields: FooFields`).
+4. **Трейт репозитория** `src/application/traits/foo_repo.rs`:
+   `trait FooRepository: ReferenceRepository<Foo> { insert, update }`.
+5. **Postgres** `src/infrastructure/db/postgres_foo_repository.rs`: константы `TABLE` и `SELECT`,
+   общие методы — однострочники через `reference_queries`, `insert`/`update` — явный `sqlx::query!`.
+6. **Сервис** `src/application/services/foo_service.rs`: `create`/`update` свои,
+   `list`/`get`/`archive`/`restore` — однострочники через `reference_service`.
+7. **HTTP** `src/interface/http/handlers/foo_handler.rs` (6 хендлеров, тег `References`) и
+   `src/interface/http/routes/foo_routes.rs`.
+8. **Регистрация**: `pub mod` в `mod.rs`, `FooAppState` в `infrastructure/app_state.rs`,
+   `.nest("/foos", ...)` в `main.rs`, пути и схемы в `interface/http/openapi.rs`.
+9. `cargo sqlx prepare` — обновить кэш запросов в `.sqlx` (нужен для офлайн-сборки в Docker).
+
+Общий код, который писать не нужно: `domain/reference.rs` (`ReferenceBase`, `ReferenceError`),
+`application/dtos/reference_dto.rs`, `application/traits/reference_repo.rs`,
+`application/services/reference_service.rs`, `infrastructure/db/reference_queries.rs`,
+`interface/http/error.rs`.
 
 ## Управление транзакциями
 
