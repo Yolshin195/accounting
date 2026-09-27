@@ -136,6 +136,52 @@ Authorization: Bearer {token}
 
 Удаляет категорию по её коду.
 
+## Справочники
+
+Все справочники (сейчас — **валюты** `currencies` и **счета** `accounts`) имеют один общий
+интерфейс. Клиенту не нужно знать о конкретных справочниках: он получает их описание из API
+и строит меню, таблицы и формы автоматически.
+
+| Метод    | Путь                                  | Описание                                              |
+|----------|---------------------------------------|-------------------------------------------------------|
+| `GET`    | `/references`                         | Описание всех справочников (поля, типы, подписи)      |
+| `GET`    | `/references/{kind}`                  | Список записей: `?page&size&q&includeArchived`        |
+| `GET`    | `/references/{kind}/{code}`           | Одна запись                                           |
+| `POST`   | `/references/{kind}`                  | Создать запись (201)                                  |
+| `PUT`    | `/references/{kind}/{code}`           | Полное обновление, `code` не меняется                 |
+| `DELETE` | `/references/{kind}/{code}`           | Перенести в архив (204)                               |
+| `POST`   | `/references/{kind}/{code}/restore`   | Вернуть из архива                                     |
+
+Запись — плоский JSON: базовые поля `id, code, name, description, sortOrder, isArchived`
++ поля справочника. Ссылки на другие справочники передаются по `code`, десятичные числа
+возвращаются строкой (как суммы транзакций):
+
+```json
+{ "code": "CARD", "name": "Карта", "currency": "RUB", "accountType": "CARD", "initialBalance": "1500.50" }
+```
+
+Описание поля в `GET /references`:
+
+```json
+{ "name": "currency", "title": "Валюта", "type": "reference", "reference": "currencies", "required": true }
+```
+
+Типы полей: `string`, `text`, `integer`, `decimal`, `boolean`, `date`, `enum` (варианты в `options`),
+`reference` (список значений — `GET /references/{reference}`).
+
+Ошибки: `{ "error": "validation" | "conflict" | "not_found" | "unknown_reference" | "internal", "message": "...", "fields": [{ "field": "name", "message": "..." }] }`
+с кодами 400 / 409 / 404 / 404 / 500.
+
+### Как добавить новый справочник
+
+1. Миграция: таблица с колонками `id, user_id, code, name, description, sort_order, is_archived`,
+   `UNIQUE (user_id, code)` + свои колонки (см. `migrations/*_create_table_accounting_accounts.up.sql`).
+2. Файл `src/domain/references/<name>.rs` с функцией `descriptor()` — описание полей
+   (см. `account.rs`).
+3. Строка `.register(<name>::descriptor())` в `src/domain/references/mod.rs`.
+
+SQL, валидация, эндпоинты и Swagger подхватываются автоматически.
+
 ## Управление транзакциями
 
 ### Создание расходной транзакции

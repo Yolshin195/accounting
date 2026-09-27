@@ -11,7 +11,11 @@ use crate::application::dtos::transaction_dto::{
 use crate::application::dtos::user_dto::{
     CreateUserDto, JwtResponse, LoginRequest, LoginTelegramBotDto,
 };
-use crate::interface::http::handlers::{category_handler, transaction_handler, user_handler};
+use crate::application::dtos::reference_dto::{ErrorResponse, ReferenceItem};
+use crate::domain::reference::{EnumOption, FieldDescriptor, FieldError, FieldType, ReferenceDescriptor};
+use crate::interface::http::handlers::{
+    category_handler, reference_handler, transaction_handler, user_handler,
+};
 
 struct SecurityAddon;
 
@@ -53,6 +57,13 @@ impl Modify for SecurityAddon {
         transaction_handler::update_transaction,
         transaction_handler::find_transaction_by_id,
         transaction_handler::sum_today_expenses_grouped_by_category,
+        reference_handler::list_reference_descriptors,
+        reference_handler::list_references,
+        reference_handler::get_reference,
+        reference_handler::create_reference,
+        reference_handler::update_reference,
+        reference_handler::archive_reference,
+        reference_handler::restore_reference,
     ),
     components(schemas(
         CreateUserDto,
@@ -68,12 +79,21 @@ impl Modify for SecurityAddon {
         Pagination,
         PageInfo,
         PagedResponse<CategoryDto>,
-        PagedResponse<TransactionDto>
+        PagedResponse<TransactionDto>,
+        ReferenceDescriptor,
+        FieldDescriptor,
+        FieldType,
+        EnumOption,
+        ReferenceItem,
+        PagedResponse<ReferenceItem>,
+        ErrorResponse,
+        FieldError
     )),
     tags(
         (name = "Users", description = "Регистрация и аутентификация пользователей"),
         (name = "Categories", description = "Управление категориями доходов/расходов"),
         (name = "Transactions", description = "Управление транзакциями"),
+        (name = "References", description = "Справочники (валюты, счета, ...) с единым интерфейсом"),
     ),
     modifiers(&SecurityAddon)
 )]

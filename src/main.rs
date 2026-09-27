@@ -27,6 +27,11 @@ use tower_http::trace::TraceLayer;
 use crate::application::services::transaction_service::TransactionService;
 use crate::infrastructure::db::postgres_transaction_repository::PostgresTransactionRepo;
 use crate::interface::http::routes::transaction_routes::get_transaction_routes;
+use crate::application::services::reference_service::ReferenceService;
+use crate::domain::references;
+use crate::infrastructure::app_state::ReferenceAppState;
+use crate::infrastructure::db::postgres_reference_repository::PostgresReferenceRepository;
+use crate::interface::http::routes::reference_routes::reference_routes;
 
 fn create_cors_layer() -> CorsLayer {
     CorsLayer::new()
@@ -80,6 +85,13 @@ async fn main() -> anyhow::Result<()> {
         transaction_service
     };
     
+    let reference_app_state = ReferenceAppState {
+        reference_service: ReferenceService::new(
+            references::registry(),
+            Arc::new(PostgresReferenceRepository::new(db_pool.clone())),
+        ),
+    };
+
     let jwt_middleware_state = Arc::new(JwtMiddlewareState {
         jwt_service: jwt_service.clone(),
         user_repo: Arc::new(user_repo.clone()),
@@ -88,6 +100,7 @@ async fn main() -> anyhow::Result<()> {
     let private_router = Router::new()
         .nest("/categories", category_routes(Arc::new(category_app_state)))
         .nest("/transactions", get_transaction_routes(Arc::new(transaction_app_state)))
+        .nest("/references", reference_routes(Arc::new(reference_app_state)))
         .layer(middleware::from_fn_with_state(
             jwt_middleware_state,
             jwt_middleware,

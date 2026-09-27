@@ -11,11 +11,13 @@ chrono = { version = "0.4.41", features = ["serde"] }
 jsonwebtoken = "9.3.1"
 rust_decimal = { version = "1.37.2", features = ["serde-with-float"] }
 serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.151"
 uuid = { version = "1.17.0", features = ["serde", "v4"] }
 anyhow = "1.0.98"
 argon2 = { version = "0.5.3", features = ["rand", "simple"] }
 rand_core = { version = "0.9.3", features = ["std"] }
 env_logger = "0.11.8"
+log = "0.4.34"
 axum = "0.8.9"
 dotenvy = "0.15"
 tower-http = { version = "0.6.6", features = ["trace", "cors"] }

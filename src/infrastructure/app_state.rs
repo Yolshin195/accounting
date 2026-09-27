@@ -1,5 +1,6 @@
 use crate::application::services::auth_service::AuthService;
 use crate::application::services::category_service::CategoryService;
+use crate::application::services::reference_service::ReferenceService;
 use crate::application::services::transaction_service::TransactionService;
 use crate::infrastructure::db::postgres_category_repository::PostgresCategoryRepo;
 use crate::infrastructure::db::postgres_transaction_repository::PostgresTransactionRepo;
@@ -18,4 +19,9 @@ pub struct UserAppState {
 #[derive(Clone)]
 pub struct TransactionAppState {
     pub transaction_service: TransactionService<PostgresTransactionRepo, PostgresCategoryRepo>
+}
+
+#[derive(Clone)]
+pub struct ReferenceAppState {
+    pub reference_service: ReferenceService,
 }
